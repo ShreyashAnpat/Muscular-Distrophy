@@ -1,35 +1,89 @@
 package com.example.musculardistrophy.ui.home;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musculardistrophy.Adapter.postAdapter;
+import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeFragment extends Fragment {
 
-    private HomeViewModel homeViewModel;
+    CircleImageView profile ;
+    ImageView message ;
+    SearchView searchView ;
+    FirebaseAuth auth ;
+    String userID ;
+    List<postData> PostData ;
+    postAdapter  adapter ;
+    RecyclerView postList;
+    FirebaseFirestore firebaseFirestore ;
+    ProgressDialog progressDialog ;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        profile = root.findViewById(R.id.profile);
+        message = root.findViewById(R.id.message);
+        postList = root.findViewById(R.id.postList);
+        auth = FirebaseAuth.getInstance();
+        userID = auth.getCurrentUser().getUid();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        PostData = new ArrayList<>();
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Loading data");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+        postList.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new postAdapter(PostData) ;
+        postList.setAdapter(adapter);
+
+        firebaseFirestore.collection("post").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (value != null){
+                    for (DocumentChange doc : value.getDocumentChanges()){
+//                        if (DocumentChange.Type.MODIFIED == doc.getType()){
+                            postData mPostData = doc.getDocument().toObject(postData.class);
+                            PostData.add(mPostData);
+                            adapter.notifyDataSetChanged();
+//                        }
+
+                    }
+                    progressDialog.cancel();
+                }
             }
         });
+
+
         return root;
     }
 }

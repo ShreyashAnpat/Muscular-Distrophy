@@ -1,5 +1,6 @@
 package com.example.musculardistrophy;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,11 +8,13 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.musculardistrophy.Login.Login_Activity;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Flash_Screen extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +27,12 @@ public class Flash_Screen extends AppCompatActivity {
             public void run() {
                 startActivity(new Intent(Flash_Screen.this, Login_Activity.class));
                 finish();
+
             }
         },4000);
 
+
     }
+
+
 }

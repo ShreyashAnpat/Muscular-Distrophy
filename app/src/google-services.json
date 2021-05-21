@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "894081471363",
+    "project_id": "muscular-dystrophy-e096a",
+    "storage_bucket": "muscular-dystrophy-e096a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894081471363:android:7ede00ddafc3cb32f95cb6",
+        "android_client_info": {
+          "package_name": "com.e.musculardystrophy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894081471363-r9o4e46r36djecbcc2pvnkfukp4k43o0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.e.musculardystrophy",
+            "certificate_hash": "a0be14f0d4b2a577882b7986a048dedaba11d619"
+          }
+        },
+        {
+          "client_id": "894081471363-2rposn6jqr27su698p46466jml37ef70.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_0vBN5EMPbA3JAPRUm9EpTHH5p-X9g7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894081471363-2rposn6jqr27su698p46466jml37ef70.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894081471363:android:bf5bb4f3ce288355f95cb6",
+        "android_client_info": {
+          "package_name": "com.example.musculardistrophy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "894081471363-2rposn6jqr27su698p46466jml37ef70.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_0vBN5EMPbA3JAPRUm9EpTHH5p-X9g7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "894081471363-2rposn6jqr27su698p46466jml37ef70.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

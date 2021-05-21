@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
+
     app:startDestination="@+id/navigation_home">
 
     <fragment
@@ -12,14 +13,20 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.musculardistrophy.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
-    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.musculardistrophy.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label="Notification"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_newPost"
+        android:name="com.example.musculardistrophy.ui.newPost.NewPostFragment"
+        android:label="New Post"
+        tools:layout="@layout/fragment_newpost" />
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.musculardistrophy.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
 </navigation>
