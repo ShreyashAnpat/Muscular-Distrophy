@@ -64,7 +64,13 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         holder.lick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                uid = postData.get(position).getUID();
+                post = postData.get(position).getPost();
+                TimeStamp = postData.get(position).getTimeStamp();
+                userName = postData.get(position).getUsername();
+                postID = postData.get(position).getPostID();
                 Toast.makeText(context, post, Toast.LENGTH_SHORT).show();
+
                 HashMap<String , Object> lickData = new HashMap<>();
                 lickData.put("userID", userID);
                 lickData.put("timeStamp", timeStamp);
@@ -123,6 +129,11 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         holder.licked.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                uid = postData.get(position).getUID();
+                post = postData.get(position).getPost();
+                TimeStamp = postData.get(position).getTimeStamp();
+                userName = postData.get(position).getUsername();
+                postID = postData.get(position).getPostID();
                 firebaseFirestore.collection("post").whereEqualTo("UID",uid ).whereEqualTo("TimeStamp", TimeStamp ).whereEqualTo("post",post).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
