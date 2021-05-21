@@ -59,14 +59,24 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         userName = postData.get(position).getUsername();
         postID = postData.get(position).getPostID();
 
+        firebaseFirestore.collection("user").document(userID).collection("savePost").document(postData.get(position).getPostID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                postID = postData.get(position).getPostID();
+                if (value.get("postID")!= null){
+                    holder.savePost.setVisibility(View.INVISIBLE);
+                    holder.savedPost.setVisibility(View.VISIBLE);
+                    postID = postData.get(position).getPostID();
+
+                }
+            }
+        });
+
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
         holder.lick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uid = postData.get(position).getUID();
-                post = postData.get(position).getPost();
-                TimeStamp = postData.get(position).getTimeStamp();
                 userName = postData.get(position).getUsername();
                 postID = postData.get(position).getPostID();
                 Toast.makeText(context, post, Toast.LENGTH_SHORT).show();
@@ -85,12 +95,9 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             }
         });
 
-
         holder.username.setText(postData.get(position).getUsername());
         Picasso.get().load(postData.get(position).getProfile()).into(holder.profile);
         Picasso.get().load(post).into(holder.postImage);
-
-
 
         firebaseFirestore.collection("post").whereEqualTo("UID",uid ).whereEqualTo("TimeStamp", TimeStamp ).whereEqualTo("post",post).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -117,14 +124,9 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                             }
                         }
                     });
-
-
                 }
             }
         });
-
-
-
 
         holder.licked.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,8 +134,6 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                 uid = postData.get(position).getUID();
                 post = postData.get(position).getPost();
                 TimeStamp = postData.get(position).getTimeStamp();
-                userName = postData.get(position).getUsername();
-                postID = postData.get(position).getPostID();
                 firebaseFirestore.collection("post").whereEqualTo("UID",uid ).whereEqualTo("TimeStamp", TimeStamp ).whereEqualTo("post",post).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -151,17 +151,27 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         holder.savePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 holder.savePost.setVisibility(View.INVISIBLE);
                 holder.savedPost.setVisibility(View.VISIBLE);
+                postID = postData.get(position).getPostID();
+
+                HashMap<String , Object> savePost = new HashMap<>();
+                savePost.put("TimeStamp" , timeStamp);
+                savePost.put("postID" , postID);
+
+                firebaseFirestore.collection("user").document(userID).collection("savePost").document(postID).set(savePost);
             }
         });
 
         holder.savedPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                postID = postData.get(position).getPostID();
                 holder.savePost.setVisibility(View.VISIBLE);
                 holder.savedPost.setVisibility(View.GONE);
+
+                firebaseFirestore.collection("user").document(userID).collection("savePost").document(postID).delete();
+
             }
         });
 

@@ -28,6 +28,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,18 +72,21 @@ public class HomeFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value != null){
                     for (DocumentChange doc : value.getDocumentChanges()){
-//                        if (DocumentChange.Type.MODIFIED == doc.getType()){
                             postData mPostData = doc.getDocument().toObject(postData.class);
                             PostData.add(mPostData);
                             adapter.notifyDataSetChanged();
-//                        }
-
                     }
                     progressDialog.cancel();
                 }
             }
         });
 
+        firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                Picasso.get().load(value.getString("Profile")).into(profile);
+            }
+        });
 
         return root;
     }
