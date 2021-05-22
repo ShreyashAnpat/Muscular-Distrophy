@@ -1,6 +1,7 @@
 package com.example.musculardistrophy.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.R;
+import com.example.musculardistrophy.ui.home.CommentActivity;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -35,7 +37,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
     Context context ;
     FirebaseFirestore firebaseFirestore ;
     FirebaseAuth auth ;
-    String userID  , uid ,TimeStamp ,post , userName , postID;
+    String userID  , uid ,TimeStamp ,post , userName , postID , captions;
     public postAdapter(List<postData> postData) {
         this.postData = postData ;
     }
@@ -58,6 +60,26 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         TimeStamp = postData.get(position).getTimeStamp();
         userName = postData.get(position).getUsername();
         postID = postData.get(position).getPostID();
+        captions = postData.get(position).getCaption();
+
+        if (postData.get(position).getCaption().equals("")){
+           holder.captions.setVisibility(View.GONE);
+        }
+        else {
+            holder.captions.setText(postData.get(position).getCaption());
+            holder.captions.setVisibility(View.VISIBLE);
+            holder.postImage.getLayoutParams().height=10;
+            holder.postImage.requestLayout();
+
+        }
+
+
+        if (postData.get(position).getPost().equals("")){
+//            holder.postImage.getLayoutParams().height = 10;
+        }
+        else {
+            Picasso.get().load(post).into(holder.postImage);
+        }
 
         firebaseFirestore.collection("user").document(userID).collection("savePost").document(postData.get(position).getPostID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -72,32 +94,20 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             }
         });
 
-        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-
-        holder.lick.setOnClickListener(new View.OnClickListener() {
+        firebaseFirestore.collection("post").document(postID).collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
-            public void onClick(View v) {
-                userName = postData.get(position).getUsername();
-                postID = postData.get(position).getPostID();
-                Toast.makeText(context, post, Toast.LENGTH_SHORT).show();
-
-                HashMap<String , Object> lickData = new HashMap<>();
-                lickData.put("userID", userID);
-                lickData.put("timeStamp", timeStamp);
-                lickData.put("userName" ,userName );
-                Toast.makeText(context, postID, Toast.LENGTH_SHORT).show();
-                firebaseFirestore.collection("post").document(postID).collection("lick").document(userID).set(lickData);
-
-                holder.licked.setVisibility(View.VISIBLE);
-                holder.licked.playAnimation();
-                holder.lick.setVisibility(View.INVISIBLE);
-
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                holder.commentCount.setText(value.getDocuments().size()+" Comments");
             }
         });
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
         holder.username.setText(postData.get(position).getUsername());
         Picasso.get().load(postData.get(position).getProfile()).into(holder.profile);
-        Picasso.get().load(post).into(holder.postImage);
+
+
+
+
 
         firebaseFirestore.collection("post").whereEqualTo("UID",uid ).whereEqualTo("TimeStamp", TimeStamp ).whereEqualTo("post",post).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -127,6 +137,28 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                 }
             }
         });
+
+        holder.lick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userName = postData.get(position).getUsername();
+                postID = postData.get(position).getPostID();
+
+                HashMap<String , Object> lickData = new HashMap<>();
+                lickData.put("userID", userID);
+                lickData.put("timeStamp", timeStamp);
+                lickData.put("userName" ,userName );
+                Toast.makeText(context, postData.get(position).getPostID(), Toast.LENGTH_SHORT).show();
+                firebaseFirestore.collection("post").document(postData.get(position).getPostID()).collection("lick").document(userID).set(lickData);
+
+                holder.licked.setVisibility(View.VISIBLE);
+                holder.licked.playAnimation();
+                holder.lick.setVisibility(View.INVISIBLE);
+
+            }
+        });
+
+
 
         holder.licked.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +207,25 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             }
         });
 
+        holder.commentCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context , CommentActivity.class);
+                intent.putExtra("postID" , postData.get(position).getPostID());
+                context.startActivity(intent);
+            }
+        });
+        holder.comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context , CommentActivity.class);
+                intent.putExtra("postID" , postData.get(position).getPostID());
+                context.startActivity(intent);
+            }
+        });
+
+
+
 
     }
 
@@ -185,9 +236,9 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView savePost , lick , savedPost  ;
+        ImageView savePost , lick , savedPost  ,comment;
         LottieAnimationView licked ;
-        TextView username , lickCount , commentCount ;
+        TextView username , lickCount , commentCount  , captions;
         CircleImageView profile ;
         ImageView postImage ;
         public ViewHolder(@NonNull View itemView) {
@@ -201,6 +252,8 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             savedPost = itemView.findViewById(R.id.savedPost);
             lickCount = itemView.findViewById(R.id.textView3);
             commentCount = itemView.findViewById(R.id.commentCount);
+            comment = itemView.findViewById(R.id.comment);
+            captions = itemView.findViewById(R.id.captions);
         }
 
     }

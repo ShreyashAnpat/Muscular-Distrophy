@@ -69,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="@id/postImage" />
 
         <LinearLayout
@@ -117,6 +118,7 @@
                />
 
             <ImageView
+                android:id="@+id/comment"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"

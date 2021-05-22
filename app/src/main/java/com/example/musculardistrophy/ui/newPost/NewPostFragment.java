@@ -242,7 +242,7 @@ public class NewPostFragment extends Fragment {
         upload.put("post" , "");
         upload.put("username" , userName.getText().toString());
         upload.put("postID", timeStamp+userID);
-        firebaseFirestore.collection("post").document().set(upload).addOnCompleteListener(new OnCompleteListener<Void>() {
+        firebaseFirestore.collection("post").document(timeStamp+userID).set(upload).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 pd.cancel();
