@@ -38,7 +38,7 @@ public class CommentActivity extends AppCompatActivity {
 
     CircleImageView postProfile , commentProfile;
     ImageView send ,postImage;
-    TextView userName;
+    TextView userName ,caption;
     EditText comment ;
     RecyclerView commentList ;
     String userID ,postID , userProfileID  , currentUserName;
@@ -62,6 +62,7 @@ public class CommentActivity extends AppCompatActivity {
         userName = findViewById(R.id.username);
         commentList = findViewById(R.id.CommentList);
         postImage = findViewById(R.id.postImage);
+        caption = findViewById(R.id.captions);
         commentDataList = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         postID = getIntent().getStringExtra("postID");
@@ -77,8 +78,21 @@ public class CommentActivity extends AppCompatActivity {
         firebaseFirestore.collection("post").document(postID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                String postImageUri = value.getString("post") ;
+                String caption_txt = value.getString("Caption");
                 Picasso.get().load(value.getString("Profile")).into(postProfile);
-                Picasso.get().load(value.getString("post")).into(postImage);
+                if (postImageUri.equals("")){
+                    postImage.setVisibility(View.GONE);
+                     caption.setPadding(50,150,40,20);
+                }else {
+                    Picasso.get().load(value.getString("post")).into(postImage);
+                }
+                if (caption_txt.equals("")){
+                    caption.setVisibility(View.GONE);
+                }else {
+                    caption.setText(caption_txt);
+                    caption.setVisibility(View.VISIBLE);
+                }
                 userName.setText(value.getString("username"));
             }
         });
