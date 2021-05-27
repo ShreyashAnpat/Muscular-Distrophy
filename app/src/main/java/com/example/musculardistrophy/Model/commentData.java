@@ -3,7 +3,7 @@ package com.example.musculardistrophy.Model;
 public class commentData {
     String Comment;
     String TimeStamp;
-    String profile;
+    String Profile;
     String userID;
     String userName;
 
@@ -16,7 +16,7 @@ public class commentData {
     public commentData(String comment, String timeStamp, String profile, String userID, String userName , String commentID) {
         Comment = comment;
         TimeStamp = timeStamp;
-        this.profile = profile;
+        this.Profile = profile;
         this.userID = userID;
         this.userName = userName;
         this.commentID = commentID ;
@@ -42,11 +42,11 @@ public class commentData {
     }
 
     public String getProfile() {
-        return profile;
+        return Profile;
     }
 
     public void setProfile(String profile) {
-        this.profile = profile;
+        this.Profile = profile;
     }
 
     public String getUserID() {

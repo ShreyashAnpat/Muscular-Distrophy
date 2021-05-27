@@ -1,5 +1,6 @@
 package com.example.musculardistrophy.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.musculardistrophy.Adapter.TabAdapter;
@@ -33,6 +35,7 @@ public class ProfileFragment extends Fragment {
     CircleImageView profile ;
     FirebaseAuth auth ;
     String userID ;
+    ImageView editProfile ;
     FirebaseFirestore firebaseFirestore ;
 
     @Override
@@ -48,6 +51,7 @@ public class ProfileFragment extends Fragment {
         firebaseFirestore = FirebaseFirestore.getInstance() ;
         auth = FirebaseAuth.getInstance();
         userID = auth.getCurrentUser().getUid();
+        editProfile= view.findViewById(R.id.imageView2);
 
         firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -60,12 +64,12 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
-
-
-
-
-
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext() , editProfile.class));
+            }
+        });
 
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_dashboard_black_24dp));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_baseline_mms_24));

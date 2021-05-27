@@ -121,7 +121,7 @@ public class CommentActivity extends AppCompatActivity {
 
                     HashMap<String , Object> Comments = new HashMap<>();
                     Comments.put("userName" ,currentUserName);
-                    Comments.put("profile" , userProfileID);
+                    Comments.put("Profile" , userProfileID);
                     Comments.put("userID" , userID);
                     Comments.put("Comment", comment_txt);
                     Comments.put("TimeStamp" ,timeStamp);
