@@ -95,7 +95,7 @@ public class Login_OTP_Activity extends AppCompatActivity {
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
 
-                        Snackbar.make(getCurrentFocus(), e.getMessage(), Snackbar.LENGTH_LONG).show();
+//                        Snackbar.make(getCurrentFocus(), e.getMessage(), Snackbar.LENGTH_LONG).show();
                     }
                 });        // OnVerificationStateChangedCallbacks
     }

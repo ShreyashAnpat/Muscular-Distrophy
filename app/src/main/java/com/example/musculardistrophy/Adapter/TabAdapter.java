@@ -39,8 +39,4 @@ public class TabAdapter  extends FragmentPagerAdapter {
         return totalTabs;
     }
 
-    @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-        return false;
-    }
 }

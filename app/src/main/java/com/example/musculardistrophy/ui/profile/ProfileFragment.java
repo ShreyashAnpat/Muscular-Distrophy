@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +28,17 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.content.ContentValues.TAG;
+
 public class ProfileFragment extends Fragment {
     TabLayout tabLayout ;
     ViewPager viewPager ;
-    TextView userName , Location , totalUser , userPosts ;
+    TextView userName , Location , totalUser , totalPost ;
     CircleImageView profile ;
     FirebaseAuth auth ;
     String userID ;
@@ -56,6 +60,8 @@ public class ProfileFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         userID = auth.getCurrentUser().getUid();
         editProfile= view.findViewById(R.id.imageView2);
+        totalUser = view.findViewById(R.id.userCount);
+        totalPost = view.findViewById(R.id.postCount);
 
         firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
@@ -68,12 +74,28 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+        firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                totalUser.setText( String.valueOf(value.getDocuments().size()));
+            }
+        });
+
+        firebaseFirestore.collection("post").whereEqualTo("UID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                totalPost.setText(String.valueOf(value.getDocuments().size()));
+            }
+        });
+
         editProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getContext() , editProfile.class));
             }
         });
+
 
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_dashboard_black_24dp));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_baseline_mms_24));

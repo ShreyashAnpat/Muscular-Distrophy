@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MuscularDistrophy">
-        <activity android:name=".ui.profile.editProfile"></activity>
+        <activity android:name=".ui.profile.userPostList"></activity>
+        <activity android:name=".ui.profile.editProfile" />
         <activity android:name=".ui.home.CommentActivity" />
         <activity android:name=".Login.Register_OTP" />
         <activity android:name=".Login.Login_OTP_Activity" />

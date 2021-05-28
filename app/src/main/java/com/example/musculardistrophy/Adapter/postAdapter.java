@@ -147,7 +147,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                 lickData.put("userID", userID);
                 lickData.put("timeStamp", timeStamp);
                 lickData.put("userName" ,userName );
-                Toast.makeText(context, postData.get(position).getPostID(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, postData.get(position).getPostID(), Toast.LENGTH_SHORT).show();
                 firebaseFirestore.collection("post").document(postData.get(position).getPostID()).collection("lick").document(userID).set(lickData);
 
                 holder.licked.setVisibility(View.VISIBLE);
