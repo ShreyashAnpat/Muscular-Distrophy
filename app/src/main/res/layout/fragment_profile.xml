@@ -19,6 +19,7 @@
             android:layout_height="50dp">
 
             <ImageView
+                android:id="@+id/logOut"
                 android:layout_margin="5dp"
                 android:layout_width="30dp"
                 android:layout_height="match_parent"

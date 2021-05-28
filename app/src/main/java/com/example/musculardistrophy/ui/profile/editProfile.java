@@ -66,7 +66,7 @@ public class editProfile extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Updating Profile");
         progressDialog.setCanceledOnTouchOutside(false);
-
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -83,10 +83,11 @@ public class editProfile extends AppCompatActivity {
                 selectImage();
             }
         });
-
+ 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressDialog.show();
                 HashMap<String , Object> updateProfile = new HashMap<>();
                 updateProfile.put("location" , address.getText().toString());
                 updateProfile.put("phoneNumber", phoneNumber.getText().toString());
@@ -95,14 +96,13 @@ public class editProfile extends AppCompatActivity {
                 firebaseFirestore.collection("user").document(userID).update(updateProfile).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        progressDialog.show();
-                        onBackPressed();
+                   progressDialog.dismiss();
+//                        onBackPressed();
                     }
                 });
 
                 HashMap<String , Object> updatePost = new HashMap<>();
-                updateProfile.put("username" , userName.getText().toString());
-
+                updatePost.put("username" , userName.getText().toString());
                 firebaseFirestore.collection("post").whereEqualTo("UID" , userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -113,16 +113,26 @@ public class editProfile extends AppCompatActivity {
                     }
                 });
 
-                firebaseFirestore.collection("post").document().collection("Comments")
-                        .whereEqualTo("userID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                HashMap<String , Object> updateComment = new HashMap<>();
+                updateComment.put("userName" , userName.getText().toString());
+                firebaseFirestore.collection("post").addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                         for (DocumentSnapshot doc : value.getDocuments()){
-                            doc.getReference().update(updatePost);
+
+                            doc.getReference().collection("Comments")
+                                    .whereEqualTo("userID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                                    for (DocumentSnapshot documentSnapshot : value.getDocuments()){
+                                        documentSnapshot.getReference().update(updateComment);
+//                                        Toast.makeText(editProfile.this, doc.getId(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }
                     }
                 });
-
 
             }
         });
@@ -159,10 +169,10 @@ public class editProfile extends AppCompatActivity {
                     @Override
                     public void onSuccess(Uri uri) {
 
-                        HashMap<String , Object> updateProfile = new HashMap<>();
-                        updateProfile.put("Profile", uri.toString());
+                        HashMap<String , Object> updateProfiles = new HashMap<>();
+                        updateProfiles.put("Profile", uri.toString());
 
-                        firebaseFirestore.collection("user").document(userID).update(updateProfile).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        firebaseFirestore.collection("user").document(userID).update(updateProfiles).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 progressDialog.dismiss();
@@ -174,7 +184,7 @@ public class editProfile extends AppCompatActivity {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                                 for (DocumentSnapshot doc : value.getDocuments()){
-                                    doc.getReference().update(updateProfile);
+                                    doc.getReference().update(updateProfiles);
                                 }
                             }
                         });
@@ -184,11 +194,27 @@ public class editProfile extends AppCompatActivity {
                             @Override
                             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                                 for (DocumentSnapshot doc : value.getDocuments()){
-                                    doc.getReference().update(updateProfile);
+                                    doc.getReference().update(updateProfiles);
                                 }
                             }
                         });
 
+                        firebaseFirestore.collection("post").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                                for (DocumentSnapshot doc : value.getDocuments()){
+                                    doc.getReference().collection("Comments")
+                                            .whereEqualTo("userID", userID).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                                            for (DocumentSnapshot documentSnapshot : value.getDocuments()){
+                                                documentSnapshot.getReference().update(updateProfiles);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
 
                     }
                 });

@@ -1,5 +1,7 @@
 package com.example.musculardistrophy.ui.profile;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.musculardistrophy.Adapter.TabAdapter;
+import com.example.musculardistrophy.Flash_Screen;
 import com.example.musculardistrophy.R;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,7 +38,7 @@ public class ProfileFragment extends Fragment {
     CircleImageView profile ;
     FirebaseAuth auth ;
     String userID ;
-    ImageView editProfile ;
+    ImageView editProfile  , logOut;
     FirebaseFirestore firebaseFirestore ;
 
     @Override
@@ -47,6 +50,7 @@ public class ProfileFragment extends Fragment {
         viewPager = view.findViewById(R.id.viewPager);
         userName = view.findViewById(R.id.username);
         Location = view.findViewById(R.id.location);
+        logOut = view.findViewById(R.id.logOut);
         profile = view.findViewById(R.id.circleImageView3);
         firebaseFirestore = FirebaseFirestore.getInstance() ;
         auth = FirebaseAuth.getInstance();
@@ -108,6 +112,27 @@ public class ProfileFragment extends Fragment {
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getContext())
+                        .setIcon(R.drawable.logo)
+                        .setTitle("Alert")
+                        .setMessage("Are you want to log out ?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                               auth.signOut();
+                               startActivity(new Intent(getContext(), Flash_Screen.class));
+                               getActivity().finish();
+                            }
+
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+            }
+        });
 
 
         return  view ;
