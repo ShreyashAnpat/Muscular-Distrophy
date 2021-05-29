@@ -1,5 +1,7 @@
 package com.example.musculardistrophy.Adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.R;
+import com.example.musculardistrophy.ui.profile.savePostList;
+import com.example.musculardistrophy.ui.profile.userPostList;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -21,6 +26,7 @@ import static android.content.ContentValues.TAG;
 
 public class UserPostAdapter extends RecyclerView.Adapter<UserPostAdapter.ViewHolder> {
     List<postData> postAdapters ;
+    Context context ;
 
     public UserPostAdapter(List<postData> postData) {
         this.postAdapters = postData ;
@@ -30,6 +36,7 @@ public class UserPostAdapter extends RecyclerView.Adapter<UserPostAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_post,parent,false);
+        context = parent.getContext();
         return  new ViewHolder(view);
     }
 
@@ -44,6 +51,15 @@ public class UserPostAdapter extends RecyclerView.Adapter<UserPostAdapter.ViewHo
             Picasso.get().load(postAdapters.get(position).getPost()).into(holder.postImage);
             holder.caption.setVisibility(View.GONE);
         }
+
+        holder.userPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, userPostList.class);
+                intent.putExtra("position", String.valueOf(position) );
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -54,10 +70,12 @@ public class UserPostAdapter extends RecyclerView.Adapter<UserPostAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView postImage ;
         TextView caption ;
+        ConstraintLayout userPost ;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             postImage  = itemView.findViewById(R.id.postImage);
             caption = itemView.findViewById(R.id.caption);
+            userPost = itemView.findViewById(R.id.constraintLayout);
         }
     }
 }

@@ -59,6 +59,7 @@ public class HomeFragment extends Fragment {
         firebaseFirestore = FirebaseFirestore.getInstance();
         PostData = new ArrayList<>();
         progressDialog = new ProgressDialog(getContext());
+
         progressDialog.setMessage("Loading data");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();

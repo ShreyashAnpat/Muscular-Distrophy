@@ -17,6 +17,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.R;
 import com.example.musculardistrophy.ui.home.CommentActivity;
+import com.example.musculardistrophy.ui.home.userProfile;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -223,8 +224,14 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             }
         });
 
-
-
+        holder.username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context , userProfile.class);
+                intent.putExtra("userID", postData.get(position).getUID());
+                context.startActivity(intent);
+            }
+        });
 
     }
 
