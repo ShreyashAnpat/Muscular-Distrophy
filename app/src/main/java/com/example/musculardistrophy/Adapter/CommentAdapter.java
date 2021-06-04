@@ -119,4 +119,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             licked = itemView.findViewById(R.id.licked);
         }
     }
+
+
+
+
+
 }

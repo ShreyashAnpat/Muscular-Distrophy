@@ -97,7 +97,7 @@ public class editProfile extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                    progressDialog.dismiss();
-//                        onBackPressed();
+                        onBackPressed();
                     }
                 });
 
@@ -176,7 +176,7 @@ public class editProfile extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 progressDialog.dismiss();
-
+                                onBackPressed();
                             }
                         });
 

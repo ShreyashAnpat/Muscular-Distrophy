@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.musculardistrophy.Adapter.TabAdapter;
 import com.example.musculardistrophy.Flash_Screen;
@@ -62,6 +63,7 @@ public class ProfileFragment extends Fragment {
         editProfile= view.findViewById(R.id.imageView2);
         totalUser = view.findViewById(R.id.userCount);
         totalPost = view.findViewById(R.id.postCount);
+
 
         firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override

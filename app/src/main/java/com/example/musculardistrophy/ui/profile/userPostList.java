@@ -37,7 +37,7 @@ public class userPostList extends AppCompatActivity {
 
         userPost = findViewById(R.id.userPost);
         auth = FirebaseAuth.getInstance();
-        userID = auth.getCurrentUser().getUid();
+        userID = getIntent().getStringExtra("UID");
         firebaseFirestore = FirebaseFirestore.getInstance();
         PostData = new ArrayList<>();
 

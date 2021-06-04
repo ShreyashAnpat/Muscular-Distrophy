@@ -57,6 +57,7 @@ public class UserPostAdapter extends RecyclerView.Adapter<UserPostAdapter.ViewHo
             public void onClick(View v) {
                 Intent intent = new Intent(context, userPostList.class);
                 intent.putExtra("position", String.valueOf(position) );
+                intent.putExtra("UID" , postAdapters.get(position).getUID());
                 context.startActivity(intent);
             }
         });

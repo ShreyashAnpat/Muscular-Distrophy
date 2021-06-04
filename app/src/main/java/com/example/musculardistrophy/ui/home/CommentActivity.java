@@ -7,14 +7,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.musculardistrophy.Adapter.CommentAdapter;
 import com.example.musculardistrophy.Model.commentData;
+import com.example.musculardistrophy.Notification.ApiService;
+import com.example.musculardistrophy.Notification.Client;
+import com.example.musculardistrophy.Notification.Data;
+import com.example.musculardistrophy.Notification.NotificationSender;
 import com.example.musculardistrophy.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -25,6 +29,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.okhttp.ResponseBody;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -33,6 +38,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static android.content.ContentValues.TAG;
 
 public class CommentActivity extends AppCompatActivity {
 
@@ -47,7 +57,9 @@ public class CommentActivity extends AppCompatActivity {
     FirebaseFirestore firebaseFirestore ;
     ProgressDialog progressDialog ;
     List<commentData> commentDataList ;
-
+    String caption_txt ;
+    String postImageUri ;
+    String fcmUrl = "https://fcm.googleapis.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +90,9 @@ public class CommentActivity extends AppCompatActivity {
         firebaseFirestore.collection("post").document(postID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                String postImageUri = value.getString("post") ;
-                String caption_txt = value.getString("Caption");
+                postImageUri = value.getString("post") ;
+                caption_txt = value.getString("Caption");
+
                 Picasso.get().load(value.getString("Profile")).into(postProfile);
                 if (postImageUri.equals("")){
                     postImage.setVisibility(View.GONE);
@@ -134,6 +147,8 @@ public class CommentActivity extends AppCompatActivity {
                         }
                     });
                 }
+
+
             }
         });
 
@@ -153,4 +168,33 @@ public class CommentActivity extends AppCompatActivity {
         });
 
     }
+
+    private void sendNotification(String s, String token, String title, String msg) {
+        Data data = new Data(title,msg , s);
+        Log.d(TAG, "ShowNotification: "+ msg);
+        NotificationSender notificationSender = new NotificationSender(data,token);
+
+        ApiService apiService = Client.getRetrofit(fcmUrl).create(ApiService.class);
+
+        apiService.sendNotification(notificationSender).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void uploadLickNotificationData(String postUserID, String profile) {
+
+        HashMap<String, Object> notification = new HashMap<>();
+        notification.put("userID" , userID);
+        notification.put("message" , "Licked You post");
+        notification.put("postImage" , profile);
+        notification.put("postID" , postID);
+        firebaseFirestore.collection("user").document(postUserID).collection("notification").document().set(notification);
+    }
+
 }

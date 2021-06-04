@@ -45,9 +45,8 @@ public class Register_OTP extends AppCompatActivity {
         userName = getIntent().getStringExtra("userName");
         location = getIntent().getStringExtra("location");
         phoneNumber = getIntent().getStringExtra("phoneNumber");
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
-        userID = auth.getUid() ;
+
+
 
         progressDialog = new ProgressDialog(Register_OTP.this);
         progressDialog.setMessage("Verifying Phone number");
@@ -109,13 +108,15 @@ public class Register_OTP extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-
+                            firebaseFirestore = FirebaseFirestore.getInstance();
+                            auth = FirebaseAuth.getInstance();
+                            userID = auth.getUid() ;
                             HashMap<String , Object> userData = new HashMap<>();
                             userData.put("userName", userName);
                             userData.put("phoneNumber" , phoneNumber);
                             userData.put("location" , location);
                             userData.put("Profile" , "https://firebasestorage.googleapis.com/v0/b/muscular-dystrophy-e096a.appspot.com/o/profile.png?alt=media&token=4440449d-bf34-43dc-a411-23de0a145c47");
-                            firebaseFirestore.collection("user").document().set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            firebaseFirestore.collection("user").document(userID).set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     progressDialog.cancel();

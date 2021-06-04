@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,10 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.musculardistrophy.Notification.ApiService;
+import com.example.musculardistrophy.Notification.Client;
+import com.example.musculardistrophy.Notification.Data;
+import com.example.musculardistrophy.Notification.NotificationSender;
 import com.example.musculardistrophy.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,9 +40,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.okhttp.ResponseBody;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -48,8 +55,12 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 
 public class NewPostFragment extends Fragment {
 
@@ -65,6 +76,7 @@ public class NewPostFragment extends Fragment {
     StorageReference Folder , ImageName ;
     ConstraintLayout writeThought , AddImage , AddVideo ;
     ProgressDialog pd ;
+    String fcmUrl = "https://fcm.googleapis.com/",Token;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -100,7 +112,7 @@ public class NewPostFragment extends Fragment {
         bottomSheetDialog.setContentView(R.layout.bottomsheet);
         bottomSheetDialog.getDismissWithAnimation();
         bottomSheetDialog.show();
-
+//
         writeThought = bottomSheetDialog.findViewById(R.id.constraintLayout3);
         writeThought.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,7 +197,6 @@ public class NewPostFragment extends Fragment {
                      isText = "No";
                  }
 
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
                 Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -218,7 +229,8 @@ public class NewPostFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 pd.cancel();
-
+                                uploadNotificationData(uri.toString());
+                                uploadLickNotificationData(userID ,uri.toString(),timeStamp+userID);
                                 NavController navController = Navigation.findNavController(getView());;
                                 navController.navigate(R.id.navigation_home);
                             }
@@ -229,6 +241,7 @@ public class NewPostFragment extends Fragment {
             }
         });
     }
+
 
     private void uploadPost() {
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
@@ -246,9 +259,71 @@ public class NewPostFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 pd.cancel();
+                uploadNotificationData(profileUri);
                 NavController navController = Navigation.findNavController(getView());;
                 navController.navigate(R.id.navigation_home);
+                uploadLickNotificationData(userID ,profileUri , timeStamp+userID);
+
+
+            }
+        });
+
+
+
+    }
+
+    private void uploadNotificationData(String profileUri) {
+
+        firebaseFirestore.collection("Tokens").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()){
+                    if (!doc.getId().equals(userID)){
+                        String title  = userName.getText().toString() + "Shared new post .";
+                        String message = "Tap to see this post";
+                        sendNotification(profileUri , doc.getString("token") ,title ,message );
+//                        Toast.makeText(getContext(), doc.getString("token"), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }
+        });
+
+    }
+
+    private void sendNotification(String s, String token, String title, String msg) {
+        Data data = new Data(title,msg , s);
+        NotificationSender notificationSender = new NotificationSender(data,token);
+
+        ApiService apiService = Client.getRetrofit(fcmUrl).create(ApiService.class);
+
+        apiService.sendNotification(notificationSender).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+            }
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
             }
         });
     }
-}
+
+    private void uploadLickNotificationData(String postUserID, String profile , String postID) {
+
+        HashMap<String, Object> notification = new HashMap<>();
+        notification.put("userID" , userID);
+        notification.put("message" , "Shared a new Post");
+        notification.put("postImage" , profile);
+        notification.put("postID" ,postID );
+
+        firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    doc.getReference().collection("notification").document().set(notification);
+                }
+            }
+        });
+
+    }
+    }
