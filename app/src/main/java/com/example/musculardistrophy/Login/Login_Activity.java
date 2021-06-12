@@ -67,7 +67,7 @@ public class Login_Activity extends AppCompatActivity {
                                 startActivity(intent);
                             }
                             else {
-                                PhoneNumber.setError("number is not register");
+                                PhoneNumber.setError("Number is not register");
                             }
                         }
                     });

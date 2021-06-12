@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Adapter.CommentAdapter;
 import com.example.musculardistrophy.Model.commentData;
 import com.example.musculardistrophy.Notification.ApiService;
@@ -47,11 +48,11 @@ import static android.content.ContentValues.TAG;
 public class CommentActivity extends AppCompatActivity {
 
     CircleImageView postProfile , commentProfile;
-    ImageView send ,postImage;
-    TextView userName ,caption;
+    ImageView send ,postImage , lick , commentIcon , savePost , savedPost;
+    TextView userName ,caption , lickCount, commentCount;
     EditText comment ;
     RecyclerView commentList ;
-    String userID ,postID , userProfileID  , currentUserName;
+    String userID ,postID , userProfileID  , currentUserName , postTimeStamp , postUserName , postUserProfile , Token;
     FirebaseAuth auth ;
     CommentAdapter adapter ;
     FirebaseFirestore firebaseFirestore ;
@@ -59,6 +60,7 @@ public class CommentActivity extends AppCompatActivity {
     List<commentData> commentDataList ;
     String caption_txt ;
     String postImageUri  , postUserID;
+    LottieAnimationView licked ;
     String fcmUrl = "https://fcm.googleapis.com/";
 
     @Override
@@ -70,6 +72,7 @@ public class CommentActivity extends AppCompatActivity {
         postProfile = findViewById(R.id.profile);
         commentProfile = findViewById(R.id.circleImageView);
         comment = findViewById(R.id.commentText);
+        commentIcon = findViewById(R.id.commentIcon);
         send = findViewById(R.id.imageView7);
         userName = findViewById(R.id.username);
         commentList = findViewById(R.id.CommentList);
@@ -78,12 +81,15 @@ public class CommentActivity extends AppCompatActivity {
         commentDataList = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         postID = getIntent().getStringExtra("postID");
-
-
+        licked = findViewById(R.id.licked);
+        lick = findViewById(R.id.like);
+        savePost = findViewById(R.id.savePosts);
         auth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         userID = auth.getCurrentUser().getUid();
-
+        savedPost = findViewById(R.id.savedPosts);
+        lickCount = findViewById(R.id.likeCount);
+        commentCount = findViewById(R.id.commentCounts);
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
 
@@ -93,8 +99,10 @@ public class CommentActivity extends AppCompatActivity {
                 postImageUri = value.getString("post") ;
                 caption_txt = value.getString("Caption");
                 postUserID = value.getString("UID");
-
-                Picasso.get().load(value.getString("Profile")).into(postProfile);
+                postTimeStamp = value.getString("TimeStamp");
+                postUserName = value.getString("username");
+                postUserProfile =value.getString("Profile") ;
+                Picasso.get().load(postUserProfile).into(postProfile);
                 if (postImageUri.equals("")){
                     postImage.setVisibility(View.GONE);
                      caption.setPadding(50,150,40,20);
@@ -108,18 +116,136 @@ public class CommentActivity extends AppCompatActivity {
                     caption.setVisibility(View.VISIBLE);
                 }
                 userName.setText(value.getString("username"));
+                value.getReference().collection("lick").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        lickCount.setText(value.getDocuments().size() + " Likes");
+                    }
+                });
+                value.getReference().collection("lick").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (value != null){
+                            if (value.get("userName")!= null){
+                                licked.setVisibility(View.VISIBLE);
+                                licked.playAnimation();
+                                lick.setVisibility(View.INVISIBLE);
+                            }
+
+                        }
+                    }
+                });
+                 value.getReference().collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                        commentCount.setText(value.getDocuments().size()+" Comments");
+                    }
+                });
+
             }
         });
+
 
         firebaseFirestore.collection("user").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 userProfileID = value.getString("Profile");
                 currentUserName = value.getString("userName");
-
                 Picasso.get().load(userProfileID).into(commentProfile);
+
+                value.getReference().collection("savePost").document(postID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (value.get("postID")!= null){
+                            savePost.setVisibility(View.INVISIBLE);
+                            savedPost.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
             }
         });
+
+        lick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String , Object> lickData = new HashMap<>();
+                lickData.put("userID", userID);
+                lickData.put("timeStamp", timeStamp);
+                lickData.put("userName" ,currentUserName );
+                firebaseFirestore.collection("post").document(postID).collection("lick").document(userID).set(lickData);
+
+                licked.setVisibility(View.VISIBLE);
+                licked.playAnimation();
+                lick.setVisibility(View.INVISIBLE);
+                firebaseFirestore.collection("Tokens").document(postUserID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (!postUserID.equals(userID)){
+                            if(postImageUri.equals("")){
+                                Token = value.getString("token");
+                                String extra = currentUserName + "lick your post.";
+                                String data = "Tab to see this post";
+                                sendNotification(userProfileID ,Token, extra ,data  );
+                                String message = " Like your post";
+                                uploadLickNotificationData(postUserID , userProfileID, message);
+                            }
+                            else {
+                                Token = value.getString("token");
+                                String extra = currentUserName + " lick your post .";
+                                String data = "Tab to see this post";
+                                String message = " Like your post";
+                                sendNotification(postImageUri ,Token, extra ,data  );
+                                uploadLickNotificationData(postUserID,postImageUri, message);
+
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+
+        licked.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseFirestore.collection("post").whereEqualTo("UID",postUserID ).whereEqualTo("TimeStamp", postTimeStamp ).whereEqualTo("post",postImageUri).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()){
+                            doc.getReference().collection("lick").document(userID).delete();
+                        }
+                    }
+                });
+                licked.setVisibility(View.INVISIBLE);
+                lick.setVisibility(View.VISIBLE);
+            }
+        });
+
+        savePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                savePost.setVisibility(View.INVISIBLE);
+                savedPost.setVisibility(View.VISIBLE);
+                HashMap<String , Object> savePost = new HashMap<>();
+                savePost.put("TimeStamp" , timeStamp);
+                savePost.put("postID" , postID);
+
+                firebaseFirestore.collection("user").document(userID).collection("savePost").document(postID).set(savePost);
+            }
+        });
+
+        savedPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                savePost.setVisibility(View.VISIBLE);
+                savedPost.setVisibility(View.GONE);
+                firebaseFirestore.collection("user").document(userID).collection("savePost").document(postID).delete();
+
+            }
+        });
+
+
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,23 +273,26 @@ public class CommentActivity extends AppCompatActivity {
                             comment.setText("");
                         }
                     });
+                    firebaseFirestore.collection("Tokens").document(postUserID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                            if (postImageUri.equals("")){
+                                Log.d(TAG, "onEvent: " + value.getString("token") );
+                                String message = " Comment on your Post";
+                                uploadLickNotificationData(postUserID,userProfileID , message);
+                                sendNotification(userProfileID , value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
+                            }
+                            else {
+                                String message = " Comment on your Post";
+                                sendNotification(postImageUri,value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
+                                uploadLickNotificationData(postUserID,postImageUri, message);
+                            }
+
+                        }
+                    });
+
                 }
                 Log.d(TAG, "onClick: "+ postUserID);
-                firebaseFirestore.collection("Tokens").document(postUserID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (postImageUri.equals("")){
-                            Log.d(TAG, "onEvent: " + value.getString("token") );
-                            uploadLickNotificationData(postUserID,userProfileID);
-                            sendNotification(userProfileID , value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
-                        }
-                        else {
-                            sendNotification(postImageUri,value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
-                            uploadLickNotificationData(postUserID,postImageUri);
-                        }
-
-                    }
-                });
             }
         });
 
@@ -202,13 +331,14 @@ public class CommentActivity extends AppCompatActivity {
         });
     }
 
-    private void uploadLickNotificationData(String postUserID, String profile) {
-
+    private void uploadLickNotificationData(String postUserID, String profile, String message) {
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
-        notification.put("message" , "Licked You post");
+        notification.put("message" , message);
         notification.put("postImage" , profile);
         notification.put("postID" , postID);
+        notification.put("TimeStamp" , timeStamp);
         firebaseFirestore.collection("user").document(postUserID).collection("notification").document().set(notification);
     }
 

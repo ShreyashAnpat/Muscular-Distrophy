@@ -49,7 +49,7 @@ public class NotificationsFragment extends Fragment {
         notificationList.setAdapter(adapter);
 
 
-        firebaseFirestore.collection("user").document(auth.getCurrentUser().getUid()).collection("notification").orderBy("TimeStamp" , Query.Direction.ASCENDING)
+        firebaseFirestore.collection("user").document(auth.getCurrentUser().getUid()).collection("notification").orderBy("TimeStamp" , Query.Direction.DESCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {

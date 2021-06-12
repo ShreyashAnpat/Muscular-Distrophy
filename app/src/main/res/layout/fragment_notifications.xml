@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.circularreveal.cardview.CircularRevealCardView
         android:id="@+id/cardView3"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -22,7 +22,7 @@
             android:textColor="@color/black"
             android:textSize="18dp"
             android:textStyle="bold" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notifications"

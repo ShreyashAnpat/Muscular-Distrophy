@@ -5,11 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -33,8 +30,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.common.net.InternetDomainName;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -49,8 +44,6 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import org.w3c.dom.Text;
-
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +53,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.ContentValues.TAG;
 
 public class NewPostFragment extends Fragment {
 
@@ -229,8 +221,7 @@ public class NewPostFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 pd.cancel();
-                                uploadNotificationData(uri.toString());
-                                uploadLickNotificationData(userID ,uri.toString(),timeStamp+userID);
+                                uploadNotificationData(uri.toString(), timeStamp);
                                 NavController navController = Navigation.findNavController(getView());;
                                 navController.navigate(R.id.navigation_home);
                             }
@@ -259,10 +250,9 @@ public class NewPostFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 pd.cancel();
-                uploadNotificationData(profileUri);
+                uploadNotificationData(profileUri ,timeStamp);
                 NavController navController = Navigation.findNavController(getView());;
                 navController.navigate(R.id.navigation_home);
-                uploadLickNotificationData(userID ,profileUri , timeStamp+userID);
 
 
             }
@@ -272,7 +262,7 @@ public class NewPostFragment extends Fragment {
 
     }
 
-    private void uploadNotificationData(String profileUri) {
+    private void uploadNotificationData(String profileUri, String timeStamp) {
 
         firebaseFirestore.collection("Tokens").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -282,7 +272,8 @@ public class NewPostFragment extends Fragment {
                         String title  = userName.getText().toString() + " Shared new post .";
                         String message = "Tap to see this post";
                         sendNotification(profileUri , doc.getString("token") ,title ,message );
-//                        Toast.makeText(getContext(), doc.getString("token"), Toast.LENGTH_SHORT).show();
+                        uploadLickNotificationData(userID ,profileUri , timeStamp+userID , doc.getId());
+
                     }
 
                 }
@@ -308,7 +299,7 @@ public class NewPostFragment extends Fragment {
         });
     }
 
-    private void uploadLickNotificationData(String postUserID, String profile , String postID) {
+    private void uploadLickNotificationData(String postUserID, String profile, String postID, String id) {
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
@@ -317,14 +308,8 @@ public class NewPostFragment extends Fragment {
         notification.put("postID" ,postID );
         notification.put("TimeStamp" , timeStamp) ;
 
-        firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    doc.getReference().collection("notification").document().set(notification);
-                }
-            }
-        });
+          firebaseFirestore.collection("user").document(id).collection("notification").document().set(notification);
+
 
     }
     }

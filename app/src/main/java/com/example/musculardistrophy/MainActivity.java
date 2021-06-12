@@ -45,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
         String UserId = auth.getCurrentUser().getUid();
 
+        String flag = getIntent().getStringExtra("flag");
+
+        if (flag.equals("1")){
+            navController.navigate(R.id.navigation_notifications);
+        }
+
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
