@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.musculardistrophy.Adapter.postAdapter;
 import com.example.musculardistrophy.Model.postData;
@@ -27,7 +28,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firestore.v1.StructuredQuery;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -44,6 +47,7 @@ public class HomeFragment extends Fragment {
     String userID ;
     List<postData> PostData ;
     postAdapter  adapter ;
+    SwipeRefreshLayout refreshLayout ;
     RecyclerView postList;
     FirebaseFirestore firebaseFirestore ;
     ProgressDialog progressDialog ;
@@ -57,28 +61,16 @@ public class HomeFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         userID = auth.getCurrentUser().getUid();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        PostData = new ArrayList<>();
         progressDialog = new ProgressDialog(getContext());
-
+        refreshLayout = root.findViewById(R.id.refresh);
         progressDialog.setMessage("Loading data");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
-        postList.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new postAdapter(PostData) ;
-        postList.setAdapter(adapter);
-
-        firebaseFirestore.collection("post").addSnapshotListener(new EventListener<QuerySnapshot>() {
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (value != null){
-                    for (DocumentChange doc : value.getDocumentChanges()){
-                            postData mPostData = doc.getDocument().toObject(postData.class);
-                            PostData.add(mPostData);
-                            adapter.notifyDataSetChanged();
-                    }
-                    progressDialog.cancel();
-                }
+            public void onRefresh() {
+                loadData();
             }
         });
 
@@ -89,6 +81,30 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        loadData();
+
         return root;
+    }
+
+    private void loadData() {
+        refreshLayout.setRefreshing(false);
+        PostData = new ArrayList<>();
+        postList.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new postAdapter(PostData) ;
+        postList.setAdapter(adapter);
+        firebaseFirestore.collection("post").orderBy("TimeStamp" , Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (value != null){
+                    for (DocumentChange doc : value.getDocumentChanges()){
+                        postData mPostData = doc.getDocument().toObject(postData.class);
+                        PostData.add(mPostData);
+                        adapter.notifyDataSetChanged();
+                    }
+                    progressDialog.cancel();
+                }
+            }
+        });
+        refreshLayout.setRefreshing(false);
     }
 }

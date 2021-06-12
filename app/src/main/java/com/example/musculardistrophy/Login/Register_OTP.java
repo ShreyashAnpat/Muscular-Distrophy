@@ -39,7 +39,7 @@ public class Register_OTP extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register__o_t_p);
-
+        auth = FirebaseAuth.getInstance();
         otp = findViewById(R.id.OTP);
         verifyOTP = findViewById(R.id.verifyOTP);
         userName = getIntent().getStringExtra("userName");
@@ -66,7 +66,7 @@ public class Register_OTP extends AppCompatActivity {
                     otp.setError("Enter Valid OTP");
                 }
                 else {
-                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(otpID,OTP);
+                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(otpID,otp.getText().toString());
                     signInWithPhoneAuthCredential(credential);
                 }
             }

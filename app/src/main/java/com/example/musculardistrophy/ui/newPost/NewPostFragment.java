@@ -279,7 +279,7 @@ public class NewPostFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()){
                     if (!doc.getId().equals(userID)){
-                        String title  = userName.getText().toString() + "Shared new post .";
+                        String title  = userName.getText().toString() + " Shared new post .";
                         String message = "Tap to see this post";
                         sendNotification(profileUri , doc.getString("token") ,title ,message );
 //                        Toast.makeText(getContext(), doc.getString("token"), Toast.LENGTH_SHORT).show();
@@ -309,12 +309,13 @@ public class NewPostFragment extends Fragment {
     }
 
     private void uploadLickNotificationData(String postUserID, String profile , String postID) {
-
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
-        notification.put("message" , "Shared a new Post");
+        notification.put("message" , " Shared a new Post");
         notification.put("postImage" , profile);
         notification.put("postID" ,postID );
+        notification.put("TimeStamp" , timeStamp) ;
 
         firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override

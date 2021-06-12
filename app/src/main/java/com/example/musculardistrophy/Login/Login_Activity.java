@@ -1,5 +1,6 @@
 package com.example.musculardistrophy.Login;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -14,6 +15,10 @@ import com.example.musculardistrophy.MainActivity;
 import com.example.musculardistrophy.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.hbb20.CountryCodePicker;
 
 public class Login_Activity extends AppCompatActivity {
@@ -22,6 +27,7 @@ public class Login_Activity extends AppCompatActivity {
     CountryCodePicker ccp ;
     Button getOtp ;
     TextView signUp ;
+    FirebaseFirestore firebaseFirestore ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +39,7 @@ public class Login_Activity extends AppCompatActivity {
         ccp.registerCarrierNumberEditText(PhoneNumber);
         getOtp = findViewById(R.id.button);
         signUp = findViewById(R.id.SignUp);
-
+        firebaseFirestore = FirebaseFirestore.getInstance() ;
 
 
 
@@ -52,9 +58,20 @@ public class Login_Activity extends AppCompatActivity {
                     PhoneNumber.setError("Enter Phone Number");
                 }
                 else {
-                    Intent intent = new Intent(Login_Activity.this , Login_OTP_Activity.class);
-                    intent.putExtra("PhoneNumber" , ccp.getFullNumberWithPlus().replace(" ",""));
-                    startActivity(intent);
+                    firebaseFirestore.collection("user").whereEqualTo("phoneNumber", ccp.getFullNumberWithPlus().replace(" ","")).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            if (!value.isEmpty()) {
+                                Intent intent = new Intent(Login_Activity.this , Login_OTP_Activity.class);
+                                intent.putExtra("PhoneNumber" , ccp.getFullNumberWithPlus().replace(" ",""));
+                                startActivity(intent);
+                            }
+                            else {
+                                PhoneNumber.setError("number is not register");
+                            }
+                        }
+                    });
+
                 }
             }
         });

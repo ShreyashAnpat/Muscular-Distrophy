@@ -58,7 +58,7 @@ public class CommentActivity extends AppCompatActivity {
     ProgressDialog progressDialog ;
     List<commentData> commentDataList ;
     String caption_txt ;
-    String postImageUri ;
+    String postImageUri  , postUserID;
     String fcmUrl = "https://fcm.googleapis.com/";
 
     @Override
@@ -92,6 +92,7 @@ public class CommentActivity extends AppCompatActivity {
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 postImageUri = value.getString("post") ;
                 caption_txt = value.getString("Caption");
+                postUserID = value.getString("UID");
 
                 Picasso.get().load(value.getString("Profile")).into(postProfile);
                 if (postImageUri.equals("")){
@@ -147,8 +148,22 @@ public class CommentActivity extends AppCompatActivity {
                         }
                     });
                 }
+                Log.d(TAG, "onClick: "+ postUserID);
+                firebaseFirestore.collection("Tokens").document(postUserID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                        if (postImageUri.equals("")){
+                            Log.d(TAG, "onEvent: " + value.getString("token") );
+                            uploadLickNotificationData(postUserID,userProfileID);
+                            sendNotification(userProfileID , value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
+                        }
+                        else {
+                            sendNotification(postImageUri,value.getString("token") ,currentUserName+"comment On your post" ,"Tap to see this comment");
+                            uploadLickNotificationData(postUserID,postImageUri);
+                        }
 
-
+                    }
+                });
             }
         });
 

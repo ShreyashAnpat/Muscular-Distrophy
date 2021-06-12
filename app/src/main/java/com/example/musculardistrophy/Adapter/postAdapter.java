@@ -52,7 +52,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
     FirebaseFirestore firebaseFirestore ;
     FirebaseAuth auth ;
     String fcmUrl = "https://fcm.googleapis.com/",Token;
-    String          userID  , uid ,TimeStamp ,post , userName , postID , captions , currentUserName , CurrentProfile;
+    String userID  , uid ,TimeStamp ,post , userName , postID , captions , currentUserName , CurrentProfile;
     public postAdapter(List<postData> postData) {
         this.postData = postData ;
     }
@@ -77,6 +77,14 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         postID = postData.get(position).getPostID();
         captions = postData.get(position).getCaption();
 
+        if (postData.get(position).getPost().equals("")){
+            holder.postImage.setVisibility(View.GONE);
+            holder.captions.setPadding(50,150,40,20);
+        }
+        else {
+            Picasso.get().load(post).into(holder.postImage);
+        }
+
         if (postData.get(position).getCaption().equals("")){
            holder.captions.setVisibility(View.GONE);
         }
@@ -84,15 +92,6 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             holder.captions.setText(postData.get(position).getCaption());
             holder.captions.setVisibility(View.VISIBLE);
 
-        }
-
-
-        if (postData.get(position).getPost().equals("")){
-            holder.postImage.setVisibility(View.GONE);
-            holder.captions.setPadding(50,150,40,20);
-        }
-        else {
-            Picasso.get().load(post).into(holder.postImage);
         }
 
         firebaseFirestore.collection("user").document(userID).collection("savePost").document(postData.get(position).getPostID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -131,7 +130,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                     doc.getReference().collection("lick").addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
                         public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                            holder.lickCount.setText(value.getDocuments().size() + " Licks");
+                            holder.lickCount.setText(value.getDocuments().size() + " Likes");
                         }
                     });
 
@@ -391,12 +390,14 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
     }
 
     private void uploadLickNotificationData(String postUserID, String profile) {
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
         notification.put("message" , "Licked You post");
         notification.put("postImage" , profile);
         notification.put("postID" , postID);
+        notification.put("TimeStamp" ,timeStamp );
         firebaseFirestore.collection("user").document(postUserID).collection("notification").document().set(notification);
     }
 
