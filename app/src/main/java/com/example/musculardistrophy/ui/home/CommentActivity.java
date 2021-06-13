@@ -105,7 +105,6 @@ public class CommentActivity extends AppCompatActivity {
                 Picasso.get().load(postUserProfile).into(postProfile);
                 if (postImageUri.equals("")){
                     postImage.setVisibility(View.GONE);
-                     caption.setPadding(50,150,40,20);
                 }else {
                     Picasso.get().load(value.getString("post")).into(postImage);
                 }

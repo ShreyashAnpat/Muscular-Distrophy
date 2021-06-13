@@ -77,12 +77,12 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         postID = postData.get(position).getPostID();
         captions = postData.get(position).getCaption();
 
-        if (postData.get(position).getPost().equals("")){
+        if (post.isEmpty()){
             holder.postImage.setVisibility(View.GONE);
-            holder.captions.setPadding(50,150,40,20);
         }
         else {
             Picasso.get().load(post).into(holder.postImage);
+            holder.postImage.setVisibility(View.VISIBLE);
         }
 
         if (postData.get(position).getCaption().equals("")){

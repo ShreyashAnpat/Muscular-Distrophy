@@ -1,6 +1,7 @@
 package com.example.musculardistrophy.ui.home;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.musculardistrophy.Adapter.postAdapter;
+import com.example.musculardistrophy.Message.MessageActivity;
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,6 +69,13 @@ public class HomeFragment extends Fragment {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
+    message.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            startActivity(new Intent(getContext() , MessageActivity.class));
+        }
+    });
+
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -81,6 +90,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
         loadData();
 
         return root;
@@ -91,15 +101,18 @@ public class HomeFragment extends Fragment {
         PostData = new ArrayList<>();
         postList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new postAdapter(PostData) ;
+        adapter.setHasStableIds(false);
         postList.setAdapter(adapter);
         firebaseFirestore.collection("post").orderBy("TimeStamp" , Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value != null){
+                    PostData.clear();
                     for (DocumentChange doc : value.getDocumentChanges()){
                         postData mPostData = doc.getDocument().toObject(postData.class);
                         PostData.add(mPostData);
                         adapter.notifyDataSetChanged();
+
                     }
                     progressDialog.cancel();
                 }
