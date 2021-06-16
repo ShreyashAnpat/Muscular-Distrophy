@@ -115,6 +115,7 @@ public class Register_OTP extends AppCompatActivity {
                             userData.put("userName", userName);
                             userData.put("phoneNumber" , phoneNumber);
                             userData.put("location" , location);
+                            userData.put("userID" ,userID);
                             userData.put("Profile" , "https://firebasestorage.googleapis.com/v0/b/muscular-dystrophy-e096a.appspot.com/o/profile.png?alt=media&token=4440449d-bf34-43dc-a411-23de0a145c47");
                             firebaseFirestore.collection("user").document(userID).set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
