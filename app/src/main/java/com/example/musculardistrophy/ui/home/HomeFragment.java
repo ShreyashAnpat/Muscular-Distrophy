@@ -7,12 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -20,9 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.musculardistrophy.Adapter.UserAccountAdapter;
 import com.example.musculardistrophy.Adapter.postAdapter;
 import com.example.musculardistrophy.Message.MessageActivity;
 import com.example.musculardistrophy.Model.postData;
+import com.example.musculardistrophy.Model.userData;
 import com.example.musculardistrophy.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
@@ -44,15 +46,17 @@ public class HomeFragment extends Fragment {
 
     CircleImageView profile ;
     ImageView message ;
-    SearchView searchView ;
+    androidx.appcompat.widget.SearchView searchView ;
     FirebaseAuth auth ;
     String userID ;
     List<postData> PostData ;
     postAdapter  adapter ;
     SwipeRefreshLayout refreshLayout ;
-    RecyclerView postList;
+    RecyclerView postList , accountList;
     FirebaseFirestore firebaseFirestore ;
     ProgressDialog progressDialog ;
+    List<userData> userDataList ;
+    UserAccountAdapter accountAdapter ;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -68,13 +72,57 @@ public class HomeFragment extends Fragment {
         progressDialog.setMessage("Loading data");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
+        searchView = root.findViewById(R.id.search);
+        accountList = root.findViewById(R.id.accountList);
+        userDataList = new ArrayList<>();
 
-    message.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            startActivity(new Intent(getContext() , MessageActivity.class));
-        }
-    });
+        accountList.setLayoutManager(new LinearLayoutManager(getContext()));
+        accountAdapter = new UserAccountAdapter(userDataList , root.getContext());
+        accountList.setAdapter(accountAdapter);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.isEmpty()) {
+                    postList.setVisibility(View.GONE);
+                    accountList.setVisibility(View.VISIBLE);
+
+                    Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
+                    query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                           if (!value.isEmpty()){
+                               for (DocumentSnapshot doc : value.getDocuments()){
+
+                                   userData mUserData = doc.toObject(userData.class);
+                                   userDataList.add(mUserData);
+                                   accountAdapter.notifyDataSetChanged();
+                               }
+
+                           }
+                        }
+                    });
+                }
+                else {
+                    postList.setVisibility(View.VISIBLE);
+                    accountList.setVisibility(View.GONE);
+                    userDataList.clear();
+                    accountAdapter.notifyDataSetChanged();
+                }
+
+                return false;
+            }
+        });
+        message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext() , MessageActivity.class));
+            }
+        });
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -108,11 +156,10 @@ public class HomeFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (value != null){
                     PostData.clear();
-                    for (DocumentChange doc : value.getDocumentChanges()){
-                        postData mPostData = doc.getDocument().toObject(postData.class);
-                        PostData.add(mPostData);
-                        adapter.notifyDataSetChanged();
-
+                    for (DocumentSnapshot  doc : value.getDocuments()){
+                            postData mPostData = doc.toObject(postData.class);
+                            PostData.add(mPostData);
+                            adapter.notifyDataSetChanged();
                     }
                     progressDialog.cancel();
                 }

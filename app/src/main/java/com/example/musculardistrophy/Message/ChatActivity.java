@@ -2,12 +2,14 @@ package com.example.musculardistrophy.Message;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +18,9 @@ import android.widget.Toast;
 import com.example.musculardistrophy.Adapter.MessageAdapter;
 import com.example.musculardistrophy.Model.messageData;
 import com.example.musculardistrophy.R;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -39,7 +44,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ChatActivity extends AppCompatActivity {
     ImageView back , options ;
     CircleImageView profile ,camera ,send ;
-    TextView userName ;
+    TextView userName , note ;
     EditText message ;
     RecyclerView messageList ;
     FirebaseFirestore firebaseFirestore ;
@@ -47,6 +52,9 @@ public class ChatActivity extends AppCompatActivity {
     String currentUserId , receiverId;
     MessageAdapter adapter ;
     List<messageData> messageDataList ;
+    ConstraintLayout block;
+    MaterialCardView inbox ;
+    Button sendRequest ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,24 +73,102 @@ public class ChatActivity extends AppCompatActivity {
         auth= FirebaseAuth.getInstance();
         currentUserId = auth.getCurrentUser().getUid();
         messageDataList = new ArrayList<>();
+        block = findViewById(R.id.request);
+        inbox = findViewById(R.id.materialCardView8);
+        sendRequest = findViewById(R.id.sendRequest);
+        note = findViewById(R.id.note);
 
         messageList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MessageAdapter(messageDataList);
         messageList.setAdapter(adapter);
 
-        firebaseFirestore.collection("user").document(currentUserId).collection("message")
-                .document(receiverId).collection(receiverId).orderBy("timeStamp" , Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId)
+                .collection(receiverId).orderBy("timeStamp" , Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                for (DocumentChange doc : value.getDocumentChanges()){
-                    if (doc.getType() == DocumentChange.Type.ADDED){
-                        messageData mMessageData = doc.getDocument().toObject(messageData.class);
-                        messageDataList.add(mMessageData);
-                        adapter.notifyDataSetChanged();
-                        messageList.smoothScrollToPosition(messageDataList.size());
-                    }
-                    messageList.smoothScrollToPosition(messageDataList.size());
+               if (!value.isEmpty()) {
+                   for (DocumentChange doc : value.getDocumentChanges()) {
+                       if (doc.getType() == DocumentChange.Type.ADDED) {
+                           messageData mMessageData = doc.getDocument().toObject(messageData.class);
+                           messageDataList.add(mMessageData);
+                           adapter.notifyDataSetChanged();
+                           messageList.smoothScrollToPosition(messageDataList.size());
+                       }
+//                       messageList.smoothScrollToPosition(messageDataList.size());
+
+                   }
+               }
+            }
+        });
+
+        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable DocumentSnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                if (value.exists()){
+
+                        if (value.get("blockAccount").equals("true") && value.get("blockedUserID").equals(currentUserId)){
+                            block.setVisibility(View.VISIBLE);
+                            messageList.setVisibility(View.GONE);
+                            inbox.setVisibility(View.GONE);
+                        }
+                        else if (value.get("blockAccount").equals("true") && value.get("blockedUserID").equals(receiverId)){
+                            block.setVisibility(View.VISIBLE);
+                            messageList.setVisibility(View.GONE);
+                            inbox.setVisibility(View.GONE);
+                            sendRequest.setVisibility(View.GONE);
+                            options.setVisibility(View.GONE);
+                            note.setText("You are blocked..!");
+                        }
+                        else {
+                            messageList.setVisibility(View.VISIBLE);
+                            block.setVisibility(View.GONE);
+                            inbox.setVisibility(View.VISIBLE);
+                            options.setVisibility(View.VISIBLE);
+                            sendRequest.setVisibility(View.VISIBLE);
+                            note.setText("");
+                        }
+
                 }
+            }
+        });
+
+        sendRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                HashMap<String , Object> blockAccount = new HashMap<>();
+                blockAccount.put("blockAccount", "false");
+                blockAccount.put("blockedUserID", currentUserId);
+                firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).set(blockAccount);
+                firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).set(blockAccount);
+            }
+        });
+
+        options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomSheetDialog bottomSheetDialog =  new BottomSheetDialog(ChatActivity.this);
+                bottomSheetDialog.setContentView(R.layout.chat_option_bottomsheet);
+                bottomSheetDialog.getDismissWithAnimation();
+                bottomSheetDialog.show();
+
+
+
+                ConstraintLayout blockAccount = bottomSheetDialog.findViewById(R.id.blockAccount);
+
+                blockAccount.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        HashMap<String , Object> blockAccount = new HashMap<>();
+                        blockAccount.put("blockAccount", "true");
+                        blockAccount.put("blockedUserID", currentUserId);
+
+                        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).set(blockAccount);
+                        firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).set(blockAccount);
+                        bottomSheetDialog.cancel();
+
+                    }
+                });
+
             }
         });
 

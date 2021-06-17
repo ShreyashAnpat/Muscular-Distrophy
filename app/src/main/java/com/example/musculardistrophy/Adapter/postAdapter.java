@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.musculardistrophy.MainActivity;
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.Notification.ApiService;
 import com.example.musculardistrophy.Notification.Client;
@@ -23,6 +24,7 @@ import com.example.musculardistrophy.Notification.Data;
 import com.example.musculardistrophy.Notification.NotificationSender;
 import com.example.musculardistrophy.R;
 import com.example.musculardistrophy.ui.home.CommentActivity;
+import com.example.musculardistrophy.ui.home.EditePostActivity;
 import com.example.musculardistrophy.ui.home.userProfile;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -213,6 +215,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()){
                             doc.getReference().collection("lick").document(userID).delete();
+
                         }
                     }
                 });
@@ -322,6 +325,9 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                 editPost.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Intent intent = new Intent(context , EditePostActivity.class);
+                        intent.putExtra("postId", postData.get(position).getPostID());
+                        context.startActivity(intent);
                         bottomSheetDialog.cancel();
                     }
                 });

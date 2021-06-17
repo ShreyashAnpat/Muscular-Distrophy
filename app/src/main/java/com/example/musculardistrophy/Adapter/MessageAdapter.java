@@ -42,6 +42,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         if (messageDataList.get(position).getSenderID().equals(auth.getCurrentUser().getUid())){
             holder.linearLayoutCompat.setGravity(Gravity.RIGHT);
             holder.message.setBackgroundResource(R.drawable.message_sender_background);
+            holder.message.setTextColor(Color.BLACK);
         }
         else {
             holder.linearLayoutCompat.setGravity(Gravity.LEFT);
