@@ -400,7 +400,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
 
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
-        notification.put("message" , "Licked You post");
+        notification.put("message" , "Licked Your post");
         notification.put("postImage" , profile);
         notification.put("postID" , postID);
         notification.put("TimeStamp" ,timeStamp );

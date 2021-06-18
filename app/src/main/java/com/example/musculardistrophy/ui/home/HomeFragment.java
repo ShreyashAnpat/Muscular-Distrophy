@@ -7,34 +7,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.musculardistrophy.Adapter.UserAccountAdapter;
+import com.example.musculardistrophy.Adapter.SearchAccountAdapter;
 import com.example.musculardistrophy.Adapter.postAdapter;
 import com.example.musculardistrophy.Message.MessageActivity;
 import com.example.musculardistrophy.Model.postData;
 import com.example.musculardistrophy.Model.userData;
 import com.example.musculardistrophy.R;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firestore.v1.StructuredQuery;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -56,7 +50,7 @@ public class HomeFragment extends Fragment {
     FirebaseFirestore firebaseFirestore ;
     ProgressDialog progressDialog ;
     List<userData> userDataList ;
-    UserAccountAdapter accountAdapter ;
+    SearchAccountAdapter searchAccountAdapter ;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -72,51 +66,7 @@ public class HomeFragment extends Fragment {
         progressDialog.setMessage("Loading data");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
-        searchView = root.findViewById(R.id.search);
-        accountList = root.findViewById(R.id.accountList);
-        userDataList = new ArrayList<>();
 
-        accountList.setLayoutManager(new LinearLayoutManager(getContext()));
-        accountAdapter = new UserAccountAdapter(userDataList , root.getContext());
-        accountList.setAdapter(accountAdapter);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (!newText.isEmpty()) {
-                    postList.setVisibility(View.GONE);
-                    accountList.setVisibility(View.VISIBLE);
-
-                    Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
-                    query.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                        @Override
-                        public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                           if (!value.isEmpty()){
-                               for (DocumentSnapshot doc : value.getDocuments()){
-
-                                   userData mUserData = doc.toObject(userData.class);
-                                   userDataList.add(mUserData);
-                                   accountAdapter.notifyDataSetChanged();
-                               }
-
-                           }
-                        }
-                    });
-                }
-                else {
-                    postList.setVisibility(View.VISIBLE);
-                    accountList.setVisibility(View.GONE);
-                    userDataList.clear();
-                    accountAdapter.notifyDataSetChanged();
-                }
-
-                return false;
-            }
-        });
         message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,6 +91,53 @@ public class HomeFragment extends Fragment {
 
         loadData();
 
+
+        accountList = root.findViewById(R.id.accountLists);
+        searchView = root.findViewById(R.id.search);
+        userDataList = new ArrayList<>();
+
+        accountList.setLayoutManager(new LinearLayoutManager(getContext()));
+        searchAccountAdapter = new SearchAccountAdapter(userDataList);
+        accountList.setAdapter(searchAccountAdapter);
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.isEmpty()){
+                    postList.setVisibility(View.INVISIBLE);
+                    accountList.setVisibility(View.VISIBLE);
+                    Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
+                    query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                            for (DocumentSnapshot documentSnapshot : value.getDocuments()){
+                                if (!documentSnapshot.getString("userID").equals(userID)){
+                                    userData mUserData = documentSnapshot.toObject(userData.class);
+                                    userDataList.add(mUserData);
+                                    searchAccountAdapter.notifyDataSetChanged();
+                                }
+
+                            }
+                        }
+                    });
+                }
+                else {
+                    postList.setVisibility(View.VISIBLE);
+                    accountList.setVisibility(View.GONE);
+                    userDataList.clear();
+                }
+                return false;
+            }
+        });
+
+
+
         return root;
     }
 
@@ -149,7 +146,7 @@ public class HomeFragment extends Fragment {
         PostData = new ArrayList<>();
         postList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new postAdapter(PostData) ;
-        adapter.setHasStableIds(false);
+
         postList.setAdapter(adapter);
         firebaseFirestore.collection("post").orderBy("TimeStamp" , Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -167,4 +164,5 @@ public class HomeFragment extends Fragment {
         });
         refreshLayout.setRefreshing(false);
     }
+
 }

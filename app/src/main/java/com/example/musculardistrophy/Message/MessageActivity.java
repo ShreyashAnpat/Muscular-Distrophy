@@ -2,6 +2,7 @@ package com.example.musculardistrophy.Message;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -27,6 +29,8 @@ public class MessageActivity extends AppCompatActivity {
     FirebaseAuth auth ;
     List<userData> userDataList ;
     MessageUserListAdapter adapter ;
+    SearchView searchView ;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         accountList = findViewById(R.id.messages);
+        searchView = findViewById(R.id.search);
         firebaseFirestore = FirebaseFirestore.getInstance() ;
         auth = FirebaseAuth.getInstance() ;
 
@@ -53,6 +58,34 @@ public class MessageActivity extends AppCompatActivity {
                     }
 
                 }
+            }
+        });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
+                query.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        userDataList.clear();
+                        for (DocumentSnapshot doc : value.getDocuments()){
+                            if (!doc.getId().toString().equals(auth.getCurrentUser().getUid())){
+                                userData mUserData = doc.toObject(userData.class);
+                                userDataList.add(mUserData);
+                                adapter.notifyDataSetChanged();
+                            }
+
+                        }
+
+                    }
+                });
+                return false;
             }
         });
     }
