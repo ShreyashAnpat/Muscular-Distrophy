@@ -27,7 +27,6 @@ public class Flash_Screen extends AppCompatActivity {
             public void run() {
                 startActivity(new Intent(Flash_Screen.this, Login_Activity.class));
                 finish();
-
             }
         },4000);
 

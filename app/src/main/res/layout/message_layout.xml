@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:gravity="left"
+    android:orientation="vertical"
     android:id="@+id/layout">
 
     <TextView
@@ -19,5 +20,35 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:cardCornerRadius="10dp"
+        android:visibility="gone"
+        android:id="@+id/imageCard"
+        android:background="@android:color/transparent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:visibility="gone"
+            android:id="@+id/messageImageLoader"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            app:lottie_rawRes="@raw/image_loader"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"/>
+        <ImageView
+
+            android:background="@drawable/message_image_background"
+            android:visibility="gone"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:id="@+id/messageImage"/>
+    </androidx.cardview.widget.CardView>
+
+
+
+
 
 </androidx.appcompat.widget.LinearLayoutCompat>

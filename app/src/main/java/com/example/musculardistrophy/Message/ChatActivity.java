@@ -6,7 +6,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,7 +32,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +63,10 @@ public class ChatActivity extends AppCompatActivity {
     ConstraintLayout block;
     MaterialCardView inbox ;
     Button sendRequest ;
+    Uri imageUri ;
+    StorageReference Folder , ImageName;
+    ProgressDialog progressDialog ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +89,9 @@ public class ChatActivity extends AppCompatActivity {
         inbox = findViewById(R.id.materialCardView8);
         sendRequest = findViewById(R.id.sendRequest);
         note = findViewById(R.id.note);
+
+        progressDialog = new ProgressDialog(this );
+        progressDialog.setCanceledOnTouchOutside(false);
 
         messageList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MessageAdapter(messageDataList);
@@ -175,25 +190,34 @@ public class ChatActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
-                String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                if (!message.getText().toString().equals("")){
+                    progressDialog.setMessage("Sending Message ....");
+                    progressDialog.show();
+                    String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+                    String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                    String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
-                HashMap<String , Object> messageData = new HashMap<>();
-                messageData.put("senderID" , currentUserId);
-                messageData.put("message" , message.getText().toString());
-                messageData.put("timeStamp" , timeStamp);
-                messageData.put("seen" , "1");
-                messageData.put("date" , currentDate);
-                messageData.put("time" , currentTime);
+                    HashMap<String , Object> messageData = new HashMap<>();
+                    messageData.put("senderID" , currentUserId);
+                    messageData.put("message" , message.getText().toString());
+                    messageData.put("timeStamp" , timeStamp);
+                    messageData.put("seen" , "1");
+                    messageData.put("date" , currentDate);
+                    messageData.put("time" , currentTime);
+                    messageData.put("type" , "text");
 
-                firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).document().set(messageData);
-                firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).collection(currentUserId).document().set(messageData);
-                message.setText("");
-
+                    firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).document().set(messageData);
+                    firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).collection(currentUserId).document().set(messageData);
+                    message.setText("");
+                    progressDialog.cancel();
+                }
+                else {
+                    Toast.makeText(ChatActivity.this, "Write a message...", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
+
 
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +235,68 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
 
+            }
+        });
     }
+
+    private void selectImage() {
+
+        CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1,1)
+                .start(this);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                imageUri = result.getUri();
+                sendMessage(imageUri);
+            }
+        }
+    }
+
+    private void sendMessage(Uri imageUri) {
+        progressDialog.setMessage("Sending image ... ");
+        progressDialog.show();
+        Folder = FirebaseStorage.getInstance().getReference().child("Message");
+        ImageName = Folder.child(auth.getCurrentUser().getUid() + imageUri.getLastPathSegment());
+        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+
+        ImageName.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                ImageName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+                        String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
+                        HashMap<String , Object> MessageData = new HashMap<>();
+                        MessageData.put("senderID" , currentUserId);
+                        MessageData.put("message" , uri.toString());
+                        MessageData.put("timeStamp" , timeStamp);
+                        MessageData.put("seen" , "1");
+                        MessageData.put("date" , currentDate);
+                        MessageData.put("time" , currentTime);
+                        MessageData.put("type" , "Image");
+
+                        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).document().set(MessageData);
+                        firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).collection(currentUserId).document().set(MessageData);
+                        progressDialog.cancel();
+                    }
+                });
+            }
+        });
+    }
+
 }

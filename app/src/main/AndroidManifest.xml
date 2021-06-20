@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MuscularDistrophy">
-        <activity android:name=".ui.home.EditePostActivity"></activity>
+        <activity android:name=".ui.home.EditePostActivity" />
         <activity android:name=".Message.ChatActivity" />
         <activity android:name=".Message.MessageActivity" />
 

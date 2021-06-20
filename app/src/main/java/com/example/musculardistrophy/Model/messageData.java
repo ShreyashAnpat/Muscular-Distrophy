@@ -8,13 +8,24 @@ public class messageData {
     String time;
     String timeStamp ;
 
-    public messageData(String date, String message, String seen, String senderID, String time, String timeStamp) {
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    String type ;
+
+    public messageData(String date, String message, String seen, String senderID, String time, String timeStamp , String type) {
         this.date = date;
         this.message = message;
         this.seen = seen;
         this.senderID = senderID;
         this.time = time;
         this.timeStamp = timeStamp;
+        this.type = type ;
     }
 
     public messageData() {
