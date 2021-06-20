@@ -2,6 +2,7 @@ package com.example.musculardistrophy.ui.home;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Adapter.CommentAdapter;
@@ -60,6 +62,7 @@ public class CommentActivity extends AppCompatActivity {
     List<commentData> commentDataList ;
     String caption_txt ;
     String postImageUri  , postUserID;
+    NestedScrollView scrollView ;
     LottieAnimationView licked ;
     String fcmUrl = "https://fcm.googleapis.com/";
 
@@ -89,6 +92,7 @@ public class CommentActivity extends AppCompatActivity {
         userID = auth.getCurrentUser().getUid();
         savedPost = findViewById(R.id.savedPosts);
         lickCount = findViewById(R.id.likeCount);
+        scrollView = findViewById(R.id.scrollView);
         commentCount = findViewById(R.id.commentCounts);
         String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
@@ -96,51 +100,56 @@ public class CommentActivity extends AppCompatActivity {
         firebaseFirestore.collection("post").document(postID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                postImageUri = value.getString("post") ;
-                caption_txt = value.getString("Caption");
-                postUserID = value.getString("UID");
-                postTimeStamp = value.getString("TimeStamp");
-                postUserName = value.getString("username");
-                postUserProfile =value.getString("Profile") ;
-                Picasso.get().load(postUserProfile).into(postProfile);
-                if (postImageUri.equals("")){
-                    postImage.setVisibility(View.GONE);
-                }else {
-                    Picasso.get().load(value.getString("post")).into(postImage);
-                }
-                if (caption_txt.equals("")){
-                    caption.setVisibility(View.GONE);
-                }else {
-                    caption.setText(caption_txt);
-                    caption.setVisibility(View.VISIBLE);
-                }
-                userName.setText(value.getString("username"));
-                value.getReference().collection("lick").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        lickCount.setText(value.getDocuments().size() + " Likes");
+                if (value.exists()){
+                    postImageUri = value.getString("post");
+                    caption_txt = value.getString("Caption");
+                    postUserID = value.getString("UID");
+                    postTimeStamp = value.getString("TimeStamp");
+                    postUserName = value.getString("username");
+                    postUserProfile = value.getString("Profile");
+                    Picasso.get().load(postUserProfile).into(postProfile);
+                    if (postImageUri.equals("")) {
+                        postImage.setVisibility(View.GONE);
+                    } else {
+                        Picasso.get().load(value.getString("post")).into(postImage);
                     }
-                });
-                value.getReference().collection("lick").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                        if (value != null){
-                            if (value.get("userName")!= null){
-                                licked.setVisibility(View.VISIBLE);
-                                licked.playAnimation();
-                                lick.setVisibility(View.INVISIBLE);
-                            }
-
+                    if (caption_txt.equals("")) {
+                        caption.setVisibility(View.GONE);
+                    } else {
+                        caption.setText(caption_txt);
+                        caption.setVisibility(View.VISIBLE);
+                    }
+                    userName.setText(value.getString("username"));
+                    value.getReference().collection("lick").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            lickCount.setText(value.getDocuments().size() + " Likes");
                         }
-                    }
-                });
-                 value.getReference().collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                        commentCount.setText(value.getDocuments().size()+" Comments");
-                    }
-                });
+                    });
+                    value.getReference().collection("lick").document(userID).addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                            if (value != null) {
+                                if (value.get("userName") != null) {
+                                    licked.setVisibility(View.VISIBLE);
+                                    licked.playAnimation();
+                                    lick.setVisibility(View.INVISIBLE);
+                                }
 
+                            }
+                        }
+                    });
+                    value.getReference().collection("Comments").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                            commentCount.setText(value.getDocuments().size() + " Comments");
+                        }
+                    });
+                }
+                else {
+                    scrollView.setVisibility(View.GONE);
+                    Toast.makeText(CommentActivity.this, "This post is deleted ... ", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -213,6 +222,7 @@ public class CommentActivity extends AppCompatActivity {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()){
                             doc.getReference().collection("lick").document(userID).delete();
+                            Toast.makeText(CommentActivity.this, "Your post is deleted ... !", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

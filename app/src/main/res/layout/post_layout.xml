@@ -69,7 +69,7 @@
                 android:id="@+id/postImage"
                 android:layout_width="match_parent"
                 android:layout_height="370dp"
-                android:scaleType="fitXY" />
+                android:scaleType="fitXY"/>
 
             <TextView
                 android:id="@+id/captions"
@@ -97,7 +97,6 @@
                 android:layout_gravity="center"
                 android:padding="3dp"
                 android:src="@drawable/heart" />
-
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lick"
