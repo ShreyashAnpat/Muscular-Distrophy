@@ -81,8 +81,10 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
 
         if (post.isEmpty()){
             holder.postImage.setVisibility(View.GONE);
+            holder.imageLoader.setVisibility(View.GONE);
         }
         else {
+            holder.imageLoader.setVisibility(View.VISIBLE);
             Picasso.get().load(post).into(holder.postImage);
             holder.postImage.setVisibility(View.VISIBLE);
         }
@@ -360,6 +362,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         TextView username , lickCount , commentCount  , captions;
         CircleImageView profile ;
         ImageView postImage ;
+        LottieAnimationView imageLoader ;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             username = itemView.findViewById(R.id.username);
@@ -374,6 +377,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
             comment = itemView.findViewById(R.id.comment);
             captions = itemView.findViewById(R.id.captions);
             option = itemView.findViewById(R.id.option);
+            imageLoader = itemView.findViewById(R.id.imageLoader);
         }
 
     }
@@ -400,7 +404,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
 
         HashMap<String, Object> notification = new HashMap<>();
         notification.put("userID" , userID);
-        notification.put("message" , "Licked Your post");
+        notification.put("message" , "Liked Your post");
         notification.put("postImage" , profile);
         notification.put("postID" , postID);
         notification.put("TimeStamp" ,timeStamp );

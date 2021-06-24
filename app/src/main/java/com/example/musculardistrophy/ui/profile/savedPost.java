@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Adapter.SavePostAdapter;
 import com.example.musculardistrophy.Adapter.UserPostAdapter;
 import com.example.musculardistrophy.Model.postData;
@@ -33,6 +35,7 @@ public class savedPost extends Fragment {
     SavePostAdapter postAdapters ;
     FirebaseFirestore firebaseFirestore ;
     String userID ;
+    LinearLayout placeholder ;
 
 
     @Override
@@ -41,6 +44,7 @@ public class savedPost extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_saved_post, container, false);
         savePost = view.findViewById(R.id.savedPost);
+        placeholder = view.findViewById(R.id.placeholder);
         firebaseFirestore = FirebaseFirestore.getInstance() ;
         auth = FirebaseAuth.getInstance();
         userID = auth.getCurrentUser().getUid();
@@ -66,6 +70,14 @@ public class savedPost extends Fragment {
                             }
                         }
                     });
+                    if (value.size()==0){
+                        placeholder.setVisibility(View.VISIBLE);
+                        savePost.setVisibility(View.GONE);
+                    }
+                    else {
+                        placeholder.setVisibility(View.GONE);
+                        savePost.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });

@@ -221,7 +221,6 @@ public class NewPostFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 pd.cancel();
-                                uploadNotificationData(uri.toString(), timeStamp);
                                 NavController navController = Navigation.findNavController(getView());;
                                 navController.navigate(R.id.navigation_home);
                             }

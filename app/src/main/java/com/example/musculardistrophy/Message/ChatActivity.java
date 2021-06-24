@@ -112,6 +112,12 @@ public class ChatActivity extends AppCompatActivity {
 //                       messageList.smoothScrollToPosition(messageDataList.size());
 
                    }
+                   if (value.size()==0){
+
+                   }
+                   else {
+
+                   }
                }
             }
         });
@@ -142,6 +148,7 @@ public class ChatActivity extends AppCompatActivity {
                             sendRequest.setVisibility(View.VISIBLE);
                             note.setText("");
                         }
+
 
                 }
             }

@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+                public boolean onQueryTextChange(String newText) {
                 if (!newText.isEmpty()){
                     postList.setVisibility(View.INVISIBLE);
                     accountList.setVisibility(View.VISIBLE);

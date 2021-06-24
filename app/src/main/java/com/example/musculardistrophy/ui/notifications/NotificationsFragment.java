@@ -1,10 +1,12 @@
 package com.example.musculardistrophy.ui.notifications;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.musculardistrophy.Adapter.NotificationAdapter;
 import com.example.musculardistrophy.Model.notificationData;
 import com.example.musculardistrophy.Model.postData;
@@ -26,9 +29,13 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static android.content.ContentValues.TAG;
 
 public class NotificationsFragment extends Fragment {
     RecyclerView notificationList ;
@@ -36,11 +43,15 @@ public class NotificationsFragment extends Fragment {
     NotificationAdapter adapter ;
     FirebaseFirestore firebaseFirestore ;
     FirebaseAuth auth ;
+    LottieAnimationView notification;
+    TextView notificationText ;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_notifications, container, false);
         notificationList = root.findViewById(R.id.notifications);
         firebaseFirestore = FirebaseFirestore.getInstance() ;
+        notification = root.findViewById(R.id.lottieAnimationView3);
+        notificationText = root.findViewById(R.id.notification_hint);
         auth = FirebaseAuth.getInstance() ;
         list = new ArrayList<>() ;
 
@@ -60,8 +71,22 @@ public class NotificationsFragment extends Fragment {
                         adapter.notifyDataSetChanged();
                     }
                 }
+
+                Log.d(TAG, "onEvent: "+list.size());
+                if (list.size() == 0 ){
+                    notification.setVisibility(View.VISIBLE);
+                    notificationText.setVisibility(View.VISIBLE);
+                    notificationList.setVisibility(View.GONE);
+                }
+                else {
+                    notificationText.setVisibility(View.GONE);
+                    notification.setVisibility(View.GONE);
+                    notificationList.setVisibility(View.VISIBLE);
+                }
+
             }
         });
+
 
         return root;
     }
