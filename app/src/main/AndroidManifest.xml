@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.musculardistrophy">
+    package="com.md.musculardistrophy">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -9,15 +9,15 @@
         android:allowBackup="true"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.MuscularDistrophy">
-        <activity android:name=".ui.home.EditePostActivity" />
-        <activity android:name=".Message.ChatActivity" />
-        <activity android:name=".Message.MessageActivity" />
+        <activity android:name="com.md.musculardistrophy.ui.home.EditPostActivity" />
+        <activity android:name="com.md.musculardistrophy.Message.ChatActivity" />
+        <activity android:name="com.md.musculardistrophy.Message.MessageActivity" />
 
         <service
-            android:name=".Notification.NotificationService"
+            android:name="com.md.musculardistrophy.Notification.NotificationService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -25,16 +25,16 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".ui.home.userProfile" />
-        <activity android:name=".ui.profile.savePostList" />
-        <activity android:name=".ui.profile.userPostList" />
-        <activity android:name=".ui.profile.editProfile" />
-        <activity android:name=".ui.home.CommentActivity" />
-        <activity android:name=".Login.Register_OTP" />
-        <activity android:name=".Login.Login_OTP_Activity" />
-        <activity android:name=".Login.Register_Activity" />
-        <activity android:name=".Login.Login_Activity" />
-        <activity android:name=".Flash_Screen">
+        <activity android:name="com.md.musculardistrophy.ui.home.userProfile" />
+        <activity android:name="com.md.musculardistrophy.ui.profile.savePostList" />
+        <activity android:name="com.md.musculardistrophy.ui.profile.userPostList" />
+        <activity android:name="com.md.musculardistrophy.ui.profile.editProfile" />
+        <activity android:name="com.md.musculardistrophy.ui.home.CommentActivity" />
+        <activity android:name="com.md.musculardistrophy.Login.Register_OTP" />
+        <activity android:name="com.md.musculardistrophy.Login.Login_OTP_Activity" />
+        <activity android:name="com.md.musculardistrophy.Login.Register_Activity" />
+        <activity android:name="com.md.musculardistrophy.Login.Login_Activity" />
+        <activity android:name="com.md.musculardistrophy.Flash_Screen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.md.musculardistrophy.MainActivity"
             android:label="@string/app_name" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"

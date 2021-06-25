@@ -8,24 +8,24 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.musculardistrophy.ui.home.HomeFragment"
+        android:name="com.md.musculardistrophy.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_notifications"
-        android:name="com.example.musculardistrophy.ui.notifications.NotificationsFragment"
+        android:name="com.md.musculardistrophy.ui.notifications.NotificationsFragment"
         android:label="Notification"
         tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/navigation_newPost"
-        android:name="com.example.musculardistrophy.ui.newPost.NewPostFragment"
+        android:name="com.md.musculardistrophy.ui.newPost.NewPostFragment"
         android:label="New Post"
         tools:layout="@layout/fragment_newpost" />
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.example.musculardistrophy.ui.profile.ProfileFragment"
+        android:name="com.md.musculardistrophy.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 
