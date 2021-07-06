@@ -222,14 +222,16 @@ public class ChatActivity extends AppCompatActivity {
                 if (!message.getText().toString().equals("")){
                     progressDialog.setMessage("Sending Message ....");
                     progressDialog.show();
-                    String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+                    String ts = Timestamp.now().toString();
+
+//                    String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
                     String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                     String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
                     HashMap<String , Object> messageData = new HashMap<>();
                     messageData.put("senderID" , currentUserId);
                     messageData.put("message" , message.getText().toString());
-                    messageData.put("timeStamp" , timeStamp);
+                    messageData.put("timeStamp" , ts);
                     messageData.put("seen" , "1");
                     messageData.put("date" , currentDate);
                     messageData.put("time" , currentTime);

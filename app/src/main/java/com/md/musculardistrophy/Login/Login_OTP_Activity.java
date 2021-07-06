@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.rpc.context.AttributeContext;
 import com.md.musculardistrophy.MainActivity;
 import com.md.musculardistrophy.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -49,7 +50,6 @@ public class Login_OTP_Activity extends AppCompatActivity {
         progressDialog = new ProgressDialog(Login_OTP_Activity.this);
         progressDialog.setMessage("Verifying ...!");
         progressDialog.setCanceledOnTouchOutside(false);
-
 
         verifyOTP.setOnClickListener(new View.OnClickListener() {
             @Override

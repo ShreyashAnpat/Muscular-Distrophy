@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:894081471363:android:7ede00ddafc3cb32f95cb6",
         "android_client_info": {
-          "package_name": "com.e.musculardystrophy"
+          "package_name": "com.md.musculardystrophy"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "894081471363-r9o4e46r36djecbcc2pvnkfukp4k43o0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.e.musculardystrophy",
+            "package_name": "com.md.musculardystrophy",
             "certificate_hash": "a0be14f0d4b2a577882b7986a048dedaba11d619"
           }
         },
@@ -46,7 +46,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:894081471363:android:bf5bb4f3ce288355f95cb6",
         "android_client_info": {
-          "package_name": "com.example.musculardistrophy"
+          "package_name": "com.md.musculardistrophy"
         }
       },
       "oauth_client": [

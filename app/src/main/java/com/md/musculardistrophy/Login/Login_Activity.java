@@ -33,6 +33,7 @@ public class Login_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+
         PhoneNumber = findViewById(R.id.number);
         ccp = findViewById(R.id.ccp);
         ccp.registerCarrierNumberEditText(PhoneNumber);
