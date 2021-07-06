@@ -42,8 +42,7 @@ public class SearchAccountAdapter extends RecyclerView.Adapter<SearchAccountAdap
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
         Picasso.get().load(userDataList.get(position).getProfile()).into(holder.profile);
         holder.userName.setText(userDataList.get(position).getUserName());
-
-        holder.profile.setOnClickListener(new View.OnClickListener() {
+        holder.account.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context , userProfile.class) ;

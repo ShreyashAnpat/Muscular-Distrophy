@@ -17,8 +17,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.Timestamp;
 import com.md.musculardistrophy.Adapter.MessageAdapter;
 import com.md.musculardistrophy.Model.messageData;
+import com.md.musculardistrophy.Model.postData;
 import com.md.musculardistrophy.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -34,6 +36,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.md.musculardistrophy.ui.home.userProfile;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -59,7 +62,7 @@ public class ChatActivity extends AppCompatActivity {
     String currentUserId , receiverId;
     MessageAdapter adapter ;
     List<messageData> messageDataList ;
-    ConstraintLayout block;
+    ConstraintLayout block , sayHi;
     MaterialCardView inbox ;
     Button sendRequest ;
     Uri imageUri ;
@@ -88,6 +91,7 @@ public class ChatActivity extends AppCompatActivity {
         inbox = findViewById(R.id.materialCardView8);
         sendRequest = findViewById(R.id.sendRequest);
         note = findViewById(R.id.note);
+        sayHi = findViewById(R.id.sayHi);
 
         progressDialog = new ProgressDialog(this );
         progressDialog.setCanceledOnTouchOutside(false);
@@ -108,16 +112,17 @@ public class ChatActivity extends AppCompatActivity {
                            adapter.notifyDataSetChanged();
                            messageList.smoothScrollToPosition(messageDataList.size());
                        }
-//                       messageList.smoothScrollToPosition(messageDataList.size());
-
                    }
-                   if (value.size()==0){
 
-                   }
-                   else {
-
-                   }
                }
+                if (value.getDocuments().size()==0){
+                    sayHi.setVisibility(View.VISIBLE);
+                    messageList.setVisibility(View.GONE);
+                }
+                else {
+                    sayHi.setVisibility(View.GONE);
+                    messageList.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -150,6 +155,24 @@ public class ChatActivity extends AppCompatActivity {
 
 
                 }
+            }
+        });
+
+        userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this , userProfile.class);
+                intent.putExtra("userID",receiverId);
+                startActivity(intent);
+            }
+        });
+
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatActivity.this , userProfile.class);
+                intent.putExtra("userID",receiverId);
+                startActivity(intent);
             }
         });
 
@@ -275,7 +298,6 @@ public class ChatActivity extends AppCompatActivity {
         progressDialog.show();
         Folder = FirebaseStorage.getInstance().getReference().child("Message");
         ImageName = Folder.child(auth.getCurrentUser().getUid() + imageUri.getLastPathSegment());
-        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
         ImageName.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -283,14 +305,16 @@ public class ChatActivity extends AppCompatActivity {
                 ImageName.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        String timeStamp = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+//                        Long tsLong = System.currentTimeMillis()/1000;
+                        String ts = Timestamp.now().toString();
+
                         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
 
                         HashMap<String , Object> MessageData = new HashMap<>();
                         MessageData.put("senderID" , currentUserId);
                         MessageData.put("message" , uri.toString());
-                        MessageData.put("timeStamp" , timeStamp);
+                        MessageData.put("timeStamp" , ts);
                         MessageData.put("seen" , "1");
                         MessageData.put("date" , currentDate);
                         MessageData.put("time" , currentTime);
@@ -299,6 +323,9 @@ public class ChatActivity extends AppCompatActivity {
                         firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).document().set(MessageData);
                         firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).collection(currentUserId).document().set(MessageData);
                         progressDialog.cancel();
+
+                        HashMap<String , Object > userListOrder = new HashMap<>();
+                        userListOrder.put("timeStamp", ts);
                     }
                 });
             }

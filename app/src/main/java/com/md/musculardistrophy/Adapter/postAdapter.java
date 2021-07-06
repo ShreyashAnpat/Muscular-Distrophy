@@ -1,5 +1,6 @@
 package com.md.musculardistrophy.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -12,6 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -23,6 +26,7 @@ import com.md.musculardistrophy.Notification.NotificationSender;
 import com.md.musculardistrophy.R;
 import com.md.musculardistrophy.ui.home.CommentActivity;
 import com.md.musculardistrophy.ui.home.EditPostActivity;
+import com.md.musculardistrophy.ui.home.lickAccountList;
 import com.md.musculardistrophy.ui.home.userProfile;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -51,6 +55,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
     Context context ;
     FirebaseFirestore firebaseFirestore ;
     FirebaseAuth auth ;
+
     String fcmUrl = "https://fcm.googleapis.com/",Token;
     String userID  , uid ,TimeStamp ,post , userName , postID , captions , currentUserName , CurrentProfile;
     public postAdapter(List<postData> postData) {
@@ -150,6 +155,17 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                         }
                     });
                 }
+            }
+        });
+
+
+        holder.lickCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent intent = new Intent(context , lickAccountList.class);
+                    intent.putExtra("postID", postData.get(position).getPostID());
+                    context.startActivity(intent);
+
             }
         });
 
@@ -272,9 +288,17 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context , userProfile.class);
-                intent.putExtra("userID", postData.get(position).getUID());
-                context.startActivity(intent);
+                if (!postData.get(position).getUID().equals(auth.getCurrentUser().getUid())){
+                    Intent intent = new Intent(context , userProfile.class);
+                    intent.putExtra("userID", postData.get(position).getUID());
+                    context.startActivity(intent);
+                }
+                else {
+                    Activity activity = (Activity) context;
+                    NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment);
+                    navController.navigate(R.id.navigation_profile);
+                }
+
             }
         });
 
@@ -297,6 +321,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                 if (userID.equals(postData.get(position).getUID())){
                     editPost.setVisibility(View.VISIBLE);
                     deletePost.setVisibility(View.VISIBLE);
+                    reportPost.setVisibility(View.GONE);
                 }
 
                 reportPost.setOnClickListener(new View.OnClickListener() {

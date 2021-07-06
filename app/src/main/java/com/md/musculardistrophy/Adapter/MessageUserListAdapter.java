@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.md.musculardistrophy.Message.ChatActivity;
 import com.md.musculardistrophy.Model.userData;
 import com.md.musculardistrophy.R;
@@ -25,16 +27,21 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MessageUserListAdapter extends RecyclerView.Adapter<MessageUserListAdapter.ViewHolder> {
     List<userData> userDataList ;
     Context context ;
+    FirebaseFirestore firebaseFirestore ;
+    FirebaseAuth auth ;
+    String currentUserName ;
+
     public MessageUserListAdapter(List<userData> userDataList) {
         this.userDataList =userDataList;
     }
 
-    @NonNull
-    @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_account_list,parent,false);
         context = parent.getContext() ;
+        firebaseFirestore  = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance() ;
+        currentUserName = auth.getCurrentUser().getUid();
         return new ViewHolder(view);
     }
 
@@ -51,6 +58,7 @@ public class MessageUserListAdapter extends RecyclerView.Adapter<MessageUserList
             }
         });
 
+//        firebaseFirestore.collection("user").document(currentUserName).collection(userDataList.get(position).getUserID()).
 
     }
 

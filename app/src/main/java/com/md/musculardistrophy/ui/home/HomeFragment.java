@@ -1,5 +1,6 @@
 package com.md.musculardistrophy.ui.home;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -15,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -92,6 +95,15 @@ public class HomeFragment extends Fragment {
         });
 
 
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Activity activity = (Activity) root.getContext();
+                NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment);
+                navController.navigate(R.id.navigation_profile);
+            }
+        });
+
         loadData();
 
 
@@ -113,7 +125,7 @@ public class HomeFragment extends Fragment {
             @Override
                 public boolean onQueryTextChange(String newText) {
                 if (!newText.isEmpty()){
-                    postList.setVisibility(View.INVISIBLE);
+                    refreshLayout.setVisibility(View.INVISIBLE);
                     accountList.setVisibility(View.VISIBLE);
                     Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
                     query.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -131,7 +143,7 @@ public class HomeFragment extends Fragment {
                     });
                 }
                 else {
-                    postList.setVisibility(View.VISIBLE);
+                    refreshLayout.setVisibility(View.VISIBLE);
                     accountList.setVisibility(View.GONE);
                     userDataList.clear();
                 }
@@ -149,7 +161,7 @@ public class HomeFragment extends Fragment {
         PostData = new ArrayList<>();
         postList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new postAdapter(PostData) ;
-
+        postList.stopNestedScroll();
         postList.setAdapter(adapter);
         firebaseFirestore.collection("post").orderBy("TimeStamp" , Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override

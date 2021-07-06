@@ -68,14 +68,15 @@ public class savedPost extends Fragment {
                             }
                         }
                     });
-                    if (value.size()==0){
-                        placeholder.setVisibility(View.VISIBLE);
-                        savePost.setVisibility(View.GONE);
-                    }
-                    else {
-                        placeholder.setVisibility(View.GONE);
-                        savePost.setVisibility(View.VISIBLE);
-                    }
+
+                }
+                if (value.getDocuments().size()==0){
+                    placeholder.setVisibility(View.VISIBLE);
+                    savePost.setVisibility(View.GONE);
+                }
+                else {
+                    placeholder.setVisibility(View.GONE);
+                    savePost.setVisibility(View.VISIBLE);
                 }
             }
         });

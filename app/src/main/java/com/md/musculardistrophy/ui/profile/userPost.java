@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.md.musculardistrophy.Adapter.UserPostAdapter;
 import com.md.musculardistrophy.Model.postData;
 import com.md.musculardistrophy.R;
@@ -31,6 +33,7 @@ public class userPost extends Fragment {
     FirebaseFirestore firebaseFirestore ;
     FirebaseAuth auth ;
     String userID ;
+    LinearLayout placeholder ;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class userPost extends Fragment {
         auth = FirebaseAuth.getInstance() ;
         userID = auth.getCurrentUser().getUid() ;
         postData = new ArrayList<>();
+        placeholder = view.findViewById(R.id.placeholder);
 
         userPostList.setLayoutManager(new GridLayoutManager(getContext(),2));
         postAdapters = new UserPostAdapter(postData);
@@ -56,6 +60,14 @@ public class userPost extends Fragment {
                         postData.add(mPostData);
                         postAdapters.notifyDataSetChanged();
                     }
+                }
+                if (value.size()==0){
+                    placeholder.setVisibility(View.VISIBLE);
+                    userPostList.setVisibility(View.GONE);
+                }
+                else {
+                    placeholder.setVisibility(View.GONE);
+                    userPostList.setVisibility(View.VISIBLE);
                 }
             }
         });
