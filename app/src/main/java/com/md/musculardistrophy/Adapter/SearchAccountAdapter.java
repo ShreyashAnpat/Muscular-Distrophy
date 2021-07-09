@@ -12,7 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.md.musculardistrophy.Model.userData;
-import com.md.musculardistrophy.R;
+
 import com.md.musculardistrophy.ui.home.userProfile;
 import com.squareup.picasso.Picasso;
 
@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import com.md.musculardistrophy.R;
 
 public class SearchAccountAdapter extends RecyclerView.Adapter<SearchAccountAdapter.ViewHolder> {
     List<userData> userDataList ;

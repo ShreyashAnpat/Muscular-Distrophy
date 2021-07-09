@@ -14,12 +14,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.md.musculardistrophy.Model.postData;
-import com.md.musculardistrophy.R;
+
 import com.md.musculardistrophy.ui.profile.savePostList;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import com.md.musculardistrophy.R;
 import static android.content.ContentValues.TAG;
 
 public class SavePostAdapter extends RecyclerView.Adapter<SavePostAdapter.ViewHolder> {

@@ -23,6 +23,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import java.util.HashMap;
 
+import com.md.musculardistrophy.R;
+
 public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();

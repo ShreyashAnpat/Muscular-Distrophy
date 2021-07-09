@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:894081471363:android:bf5bb4f3ce288355f95cb6",
         "android_client_info": {
-          "package_name": "com.md.musculardistrophy"
+          "package_name": "com.example.musculardistrophy"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "894081471363-n40ehv7uedfnfl44v5ej8ci8okrel8cv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.md.musculardistrophy",
+            "package_name": "com.example.musculardistrophy",
             "certificate_hash": "774f8712ed6e1a5cf4b7c04d23faf0d967d6bc31"
           }
         },
@@ -50,6 +50,22 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "894081471363-aka8foa89tjpqv9tp5kpf0tfa0s20jip.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.md.musculardistrophy",
+            "certificate_hash": "774f8712ed6e1a5cf4b7c04d23faf0d967d6bc31"
+          }
+        },
+        {
+          "client_id": "894081471363-slkbvju7fdbeu609fjl6529ui48rt8co.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.md.musculardistrophy",
+            "certificate_hash": "31679328aff0fed5855736e8701beff4674722f0"
+          }
+        },
         {
           "client_id": "894081471363-2rposn6jqr27su698p46466jml37ef70.apps.googleusercontent.com",
           "client_type": 3

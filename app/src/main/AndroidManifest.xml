@@ -13,7 +13,7 @@
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.MuscularDistrophy">
-        <activity android:name=".ui.home.lickAccountList"></activity>
+        <activity android:name="com.md.musculardistrophy.ui.home.lickAccountList"></activity>
         <activity android:name=".ui.home.EditPostActivity" />
         <activity android:name=".Message.ChatActivity" />
         <activity android:name=".Message.MessageActivity" />

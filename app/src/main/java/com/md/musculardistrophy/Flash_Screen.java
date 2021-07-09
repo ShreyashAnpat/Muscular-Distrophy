@@ -1,15 +1,20 @@
 package com.md.musculardistrophy;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.md.musculardistrophy.Login.Login_Activity;
+
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+
+
+import com.md.musculardistrophy.R;
 
 public class Flash_Screen extends AppCompatActivity {
 

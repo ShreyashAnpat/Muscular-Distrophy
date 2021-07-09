@@ -23,7 +23,7 @@ import com.md.musculardistrophy.Notification.ApiService;
 import com.md.musculardistrophy.Notification.Client;
 import com.md.musculardistrophy.Notification.Data;
 import com.md.musculardistrophy.Notification.NotificationSender;
-import com.md.musculardistrophy.R;
+
 import com.md.musculardistrophy.ui.home.CommentActivity;
 import com.md.musculardistrophy.ui.home.EditPostActivity;
 import com.md.musculardistrophy.ui.home.lickAccountList;
@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import com.md.musculardistrophy.R;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

@@ -15,13 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.md.musculardistrophy.Model.messageData;
-import com.md.musculardistrophy.R;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import com.md.musculardistrophy.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     List<messageData> messageDataList ;

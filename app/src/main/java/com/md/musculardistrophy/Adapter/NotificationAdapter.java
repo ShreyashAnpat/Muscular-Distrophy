@@ -15,7 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.md.musculardistrophy.Model.notificationData;
-import com.md.musculardistrophy.R;
+
 import com.md.musculardistrophy.ui.home.CommentActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -26,6 +26,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import com.md.musculardistrophy.R;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     List<notificationData> notificationDataList ;
