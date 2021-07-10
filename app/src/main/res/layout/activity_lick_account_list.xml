@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ui.home.lickAccountList">
     <com.google.android.material.circularreveal.cardview.CircularRevealCardView
         android:id="@+id/cardView3"
@@ -22,5 +23,20 @@
             android:textSize="18dp"
             android:textStyle="bold" />
     </com.google.android.material.circularreveal.cardview.CircularRevealCardView>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        app:lottie_rawRes="@raw/notification"
+        app:lottie_autoPlay="true"
+        android:visibility="gone"
+        app:lottie_loop="true"
+        android:id="@+id/notification"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/likeUser"/>
 
 </androidx.appcompat.widget.LinearLayoutCompat>

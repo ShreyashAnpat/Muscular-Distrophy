@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.firebase.firestore.DocumentChange;
 import com.md.musculardistrophy.Adapter.MessageUserListAdapter;
 import com.md.musculardistrophy.Model.userData;
 import com.md.musculardistrophy.R;
@@ -30,7 +32,7 @@ public class MessageActivity extends AppCompatActivity {
     List<userData> userDataList ;
     MessageUserListAdapter adapter ;
     SearchView searchView ;
-
+    SwipeRefreshLayout refreshLayout ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +49,34 @@ public class MessageActivity extends AppCompatActivity {
         adapter = new MessageUserListAdapter(userDataList);
         accountList.setAdapter(adapter);
 
+        refreshLayout = findViewById(R.id.refresh);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                userDataList.clear();
+                firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        for (DocumentChange doc : value.getDocumentChanges()){
+                            if (!doc.getDocument().getId().toString().equals(auth.getCurrentUser().getUid())){
+                                userData mUserData = doc.getDocument().toObject(userData.class);
+                                userDataList.add(mUserData);
+                                adapter.notifyDataSetChanged();
+                            }
+
+                        }
+                    }
+                });
+                refreshLayout.setRefreshing(false);
+            }
+        });
+
         firebaseFirestore.collection("user").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()){
-                    if (!doc.getId().toString().equals(auth.getCurrentUser().getUid())){
-                        userData mUserData = doc.toObject(userData.class);
+                for (DocumentChange doc : value.getDocumentChanges()){
+                    if (!doc.getDocument().getId().toString().equals(auth.getCurrentUser().getUid())){
+                        userData mUserData = doc.getDocument().toObject(userData.class);
                         userDataList.add(mUserData);
                         adapter.notifyDataSetChanged();
                     }
