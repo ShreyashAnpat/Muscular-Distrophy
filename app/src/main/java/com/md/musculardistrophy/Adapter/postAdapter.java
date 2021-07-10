@@ -102,6 +102,15 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
 
         }
 
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context , CommentActivity.class);
+                intent.putExtra("postID" , postData.get(position).getPostID());
+                context.startActivity(intent);
+            }
+        });
+
         firebaseFirestore.collection("user").document(userID).collection("savePost").document(postData.get(position).getPostID()).addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
