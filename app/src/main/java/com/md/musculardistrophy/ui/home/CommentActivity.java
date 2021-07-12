@@ -192,7 +192,7 @@ public class CommentActivity extends AppCompatActivity {
                         if (!postUserID.equals(userID)){
                             if(postImageUri.equals("")){
                                 Token = value.getString("token");
-                                String extra = currentUserName + "lick your post.";
+                                String extra = currentUserName + "like your post.";
                                 String data = "Tab to see this post";
                                 sendNotification(userProfileID ,Token, extra ,data  );
                                 String message = " Like your post";

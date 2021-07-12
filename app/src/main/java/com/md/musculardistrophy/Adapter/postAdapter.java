@@ -208,14 +208,14 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
                         if (!postData.get(position).getUID().equals(userID)){
                             if(postData.get(position).getPost().equals("")){
                                 Token = value.getString("token");
-                                String extra = currentUserName + "lick your post.";
+                                String extra = currentUserName + "like your post.";
                                 String data = "Tab to see this post";
                                 sendNotification(CurrentProfile ,Token, extra ,data  );
                                 uploadLickNotificationData(postData.get(position).getUID() ,postData.get(position).getProfile());
                             }
                             else {
                                 Token = value.getString("token");
-                                String extra = currentUserName + " lick your post .";
+                                String extra = currentUserName + " like your post .";
                                 String data = "Tab to see this post";
                                 sendNotification(postData.get(position).getPost() ,Token, extra ,data  );
                                 uploadLickNotificationData(postData.get(position).getUID(),postData.get(position).getPost());
