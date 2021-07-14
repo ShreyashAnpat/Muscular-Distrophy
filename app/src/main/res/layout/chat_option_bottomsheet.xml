@@ -14,11 +14,40 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/blockAccount"
+        android:id="@+id/clearChat"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         style="?android:borderlessButtonStyle"
         app:layout_constraintTop_toBottomOf="@+id/line">
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="45dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/delete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="#272626"
+            android:text="Clear Chat"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView4"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/blockAccount"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        style="?android:borderlessButtonStyle"
+        app:layout_constraintTop_toBottomOf="@+id/clearChat">
 
         <ImageView
             android:id="@+id/imageView3"

@@ -1,5 +1,8 @@
 package com.md.musculardistrophy.Adapter;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -7,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
@@ -14,6 +18,9 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.md.musculardistrophy.Message.ChatActivity;
 import com.md.musculardistrophy.Model.messageData;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,6 +35,9 @@ import com.md.musculardistrophy.R;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     List<messageData> messageDataList ;
     FirebaseAuth auth ;
+    Context context ;
+    String userID ;
+    FirebaseFirestore firebaseFirestore ;
 
     public MessageAdapter(List<messageData> messageDataList) {
         this.messageDataList = messageDataList ;
@@ -39,6 +49,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout,parent,false);
+        context = parent.getContext();
+        firebaseFirestore  = FirebaseFirestore.getInstance();
+        userID = auth.getCurrentUser().getUid();
         return new ViewHolder(view);
     }
 
@@ -75,6 +88,59 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.linearLayoutCompat.setGravity(Gravity.LEFT);
             }
         }
+
+
+//        holder.linearLayoutCompat.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                if (messageDataList.get(position).getSenderID().equals(auth.getCurrentUser().getUid())){
+//                    new AlertDialog.Builder(context)
+//                            .setMessage("Delete Message !")
+//                            .setNegativeButton("Delete for Me ", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    firebaseFirestore.collection("user").document(userID).collection("message")
+//                                            .document(messageDataList.get(position).getSenderID()).collection(messageDataList.get(position).getSenderID())
+//                                            .document(messageDataList.get(position).getDate()+messageDataList.get(position).getTime()).delete();
+//                                }
+//                            })
+//                            .setPositiveButton("Delete for Everyone ", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    Toast.makeText(context, "Delete from Me", Toast.LENGTH_SHORT).show();
+//                                }
+//                            })
+//                            .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    Toast.makeText(context, "Cancel", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }).show();
+//
+//
+//                }
+//                else {
+//                    new AlertDialog.Builder(context)
+//                            .setMessage("Cancel")
+//                            .setPositiveButton("Cancel ", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//
+//                                }
+//                            })
+//                            .setNeutralButton("Delete for Me", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                   firebaseFirestore.collection("user").document(userID).collection("message")
+//                                           .document(messageDataList.get(position).getSenderID()).collection(messageDataList.get(position).getSenderID())
+//                                           .document(messageDataList.get(position).getDate()+messageDataList.get(position).getTime()).delete();
+//                                }
+//                            }).show();
+//                }
+//
+//                return false;
+//            }
+//        });
 
     }
 

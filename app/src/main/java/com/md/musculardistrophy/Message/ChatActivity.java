@@ -195,9 +195,29 @@ public class ChatActivity extends AppCompatActivity {
                 bottomSheetDialog.getDismissWithAnimation();
                 bottomSheetDialog.show();
 
-
+                ProgressDialog progressDialog = new ProgressDialog(ChatActivity.this);
+                progressDialog.setMessage("Clearing Chat ....!");
+                progressDialog.setCanceledOnTouchOutside(false);
 
                 ConstraintLayout blockAccount = bottomSheetDialog.findViewById(R.id.blockAccount);
+                ConstraintLayout clearChat = bottomSheetDialog.findViewById(R.id.clearChat);
+                
+                clearChat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        progressDialog.show();
+                        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                                for (DocumentSnapshot doc : value.getDocuments()){
+                                    doc.getReference().delete();
+                                }
+                            }
+                        });
+                        progressDialog.cancel();
+                        bottomSheetDialog.cancel();
+                    }
+                });
 
                 blockAccount.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -325,6 +345,7 @@ public class ChatActivity extends AppCompatActivity {
                         firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).document().set(MessageData);
                         firebaseFirestore.collection("user").document(receiverId).collection("message").document(currentUserId).collection(currentUserId).document().set(MessageData);
                         progressDialog.cancel();
+
 
                         HashMap<String , Object > userListOrder = new HashMap<>();
                         userListOrder.put("timeStamp", ts);

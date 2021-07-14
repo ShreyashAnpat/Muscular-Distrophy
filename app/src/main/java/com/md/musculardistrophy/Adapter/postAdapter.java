@@ -414,6 +414,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.ViewHolder> {
         }
 
     }
+
     private void sendNotification(String s, String token, String title, String msg) {
         Data data = new Data(title,msg , s);
         Log.d(TAG, "ShowNotification: "+ msg);
