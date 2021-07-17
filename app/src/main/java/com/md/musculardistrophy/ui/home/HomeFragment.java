@@ -127,6 +127,7 @@ public class HomeFragment extends Fragment {
                 if (!newText.isEmpty()){
                     refreshLayout.setVisibility(View.INVISIBLE);
                     accountList.setVisibility(View.VISIBLE);
+                    userDataList.clear();
                     Query query = firebaseFirestore.collection("user").orderBy("userName").startAt(newText).endAt(newText+"\uf9ff" );
                     query.addSnapshotListener(new EventListener<QuerySnapshot>() {
                         @Override
@@ -140,7 +141,10 @@ public class HomeFragment extends Fragment {
 
                             }
                         }
+
                     });
+                    userDataList.clear();
+
                 }
                 else {
                     refreshLayout.setVisibility(View.VISIBLE);

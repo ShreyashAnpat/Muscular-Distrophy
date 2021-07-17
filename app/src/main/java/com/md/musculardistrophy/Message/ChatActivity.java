@@ -1,5 +1,6 @@
 package com.md.musculardistrophy.Message;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -17,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.md.musculardistrophy.Adapter.MessageAdapter;
 import com.md.musculardistrophy.Model.messageData;
@@ -40,6 +43,8 @@ import com.md.musculardistrophy.ui.home.userProfile;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -206,10 +211,10 @@ public class ChatActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         progressDialog.show();
-                        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                        firebaseFirestore.collection("user").document(currentUserId).collection("message").document(receiverId).collection(receiverId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                                for (DocumentSnapshot doc : value.getDocuments()){
+                            public void onComplete(@NonNull @NotNull Task<QuerySnapshot> task) {
+                                for (DocumentSnapshot doc : task.getResult().getDocuments()){
                                     doc.getReference().delete();
                                 }
                             }
